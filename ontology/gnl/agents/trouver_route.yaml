@@ -1,0 +1,125 @@
+# ============================================================================
+# AGENT : TROUVER ROUTE
+# ============================================================================
+# Définition de l'outil de recherche de routes pour les agents IA
+# ============================================================================
+
+tool:
+  name: "trouver_route"
+  description: "Trouve la route optimale dans le réseau GNL"
+  agent_type: "logistics"
+  
+  # ---------- Paramètres ----------
+  parameters:
+    - name: "start_id"
+      type: "string"
+      required: true
+      description: "ID du nœud de départ"
+      example: "TERM-001"
+    
+    - name: "end_id"
+      type: "string"
+      required: true
+      description: "ID du nœud d'arrivée"
+      example: "CLIENT-001"
+    
+    - name: "exclude_id"
+      type: "string"
+      required: false
+      description: "ID du nœud à exclure (panne)"
+      example: "PIPE-001"
+    
+    - name: "max_distance"
+      type: "integer"
+      required: false
+      default: 10
+      description: "Distance maximale en sauts"
+  
+  # ---------- Requêtes Cypher ----------
+  cypher_queries:
+    # Plus court chemin
+    shortest_path: |
+      MATCH path = shortestPath(
+        (start {id: $start_id})-[:ALIMENTE|DESSERT*1..$max_distance]-(end {id: $end_id})
+      )
+      RETURN [n in nodes(path) | n.id] as path,
+             [n in nodes(path) | labels(n)[0]] as types,
+             length(path) as distance,
+             [r in relationships(path) | type(r)] as relations
+      LIMIT 1
+    
+    # Route alternative
+    alternative_path: |
+      MATCH path = shortestPath(
+        (start {id: $start_id})-[:ALIMENTE|DESSERT*1..$max_distance]-(end {id: $end_id})
+      )
+      WHERE NONE(n IN nodes(path) WHERE n.id = $exclude_id)
+      RETURN [n in nodes(path) | n.id] as path,
+             [n in nodes(path) | labels(n)[0]] as types,
+             length(path) as distance,
+             [r in relationships(path) | type(r)] as relations
+      LIMIT 1
+    
+    # Tous les chemins
+    all_paths: |
+      MATCH path = (start {id: $start_id})-[:ALIMENTE|DESSERT*1..$max_distance]-(end {id: $end_id})
+      RETURN [n in nodes(path) | n.id] as path,
+             length(path) as distance,
+             [r in relationships(path) | type(r)] as relations
+      ORDER BY distance ASC
+      LIMIT 5
+    
+    # Vérification des équipements
+    check_equipment: |
+      MATCH (e {id: $exclude_id})
+      RETURN e.id as id,
+             e.nom as nom,
+             labels(e)[0] as type,
+             e.statut as statut
+      LIMIT 1
+  
+  # ---------- Réponse ----------
+  response_template: |
+    🗺️ ROUTE OPTIMALE
+    
+    📍 DÉPART : {start_id}
+    📍 ARRIVÉE : {end_id}
+    📏 DISTANCE : {distance} sauts
+    
+    🚧 EXCLUSIONS : {exclusions}
+    
+    🚀 ITINÉRAIRE :
+    {route_steps}
+    
+    🔗 RELATIONS :
+    {relations_list}
+    
+    💡 RECOMMANDATIONS :
+    {recommendations}
+  
+  # ---------- Exemple ----------
+  example:
+    input:
+      start_id: "TERM-001"
+      end_id: "CLIENT-001"
+    output: |
+      🗺️ ROUTE OPTIMALE
+      
+      📍 DÉPART : TERM-001
+      📍 ARRIVÉE : CLIENT-001
+      📏 DISTANCE : 2 sauts
+      
+      🚧 EXCLUSIONS : Aucune
+      
+      🚀 ITINÉRAIRE :
+      1. 🚀 TERM-001 (Terminal) - DÉPART
+      2. 📍 PIPE-001 (Pipeline)
+      3. 🏁 CLIENT-001 (Client) - ARRIVÉE
+      
+      🔗 RELATIONS :
+      - ALIMENTE
+      - DESSERT
+      
+      💡 RECOMMANDATIONS :
+      - Route optimale disponible
+      - Aucun incident sur le chemin

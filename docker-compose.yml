@@ -1,0 +1,169 @@
+version: '3.8'
+
+services:
+  # Neo4j - Base de données graphe
+  neo4j:
+    image: neo4j:5.14.0-enterprise
+    container_name: gnl-neo4j
+    environment:
+      NEO4J_ACCEPT_LICENSE_AGREEMENT: "yes"
+      NEO4J_PLUGINS: '["apoc","bloom","graph-data-science"]'
+      NEO4J_dbms_memory_heap_initial__size: "512m"
+      NEO4J_dbms_memory_heap_max__size: "4g"
+      NEO4J_dbms_memory_pagecache_size: "2g"
+      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-password}
+    ports:
+      - "7474:7474"   # HTTP - Interface web Neo4j Browser
+      - "7687:7687"   # Bolt - Connexion des applications
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_import:/var/lib/neo4j/import
+    networks:
+      - gnl-network
+
+  # Qdrant - Base de données vectorielle
+  qdrant:
+    image: qdrant/qdrant:v1.7.0
+    container_name: gnl-qdrant
+    environment:
+      QDRANT__SERVICE__API_KEY: ${QDRANT_API_KEY:-}
+      QDRANT__STORAGE__STORAGE_PATH: /qdrant/storage
+    ports:
+      - "6333:6333"   # HTTP
+      - "6334:6334"   # gRPC
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    networks:
+      - gnl-network
+
+  # Zookeeper - Nécessaire pour Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: gnl-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - gnl-network
+
+  # Kafka - Messagerie et streaming
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: gnl-kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_LOG_RETENTION_MS: 604800000  # 7 jours
+      KAFKA_COMPRESSION_TYPE: snappy
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - gnl-network
+
+  # Redis - Cache et mémoire
+  redis:
+    image: redis:7.2-alpine
+    container_name: gnl-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - gnl-network
+
+  # Prometheus - Monitoring
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: gnl-prometheus
+    volumes:
+      - ./config/shared/monitoring.yaml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - gnl-network
+    profiles:
+      - monitoring
+
+  # Grafana - Dashboard
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: gnl-grafana
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/shared/grafana-dashboards:/etc/grafana/provisioning/dashboards
+    ports:
+      - "3000:3000"
+    networks:
+      - gnl-network
+    profiles:
+      - monitoring
+
+  # ========================================================
+  # BACKEND (FastAPI) - BIEN ALIGNÉ AVEC neo4j, qdrant...
+  # ========================================================
+  backend:
+    build: ./backend
+    container_name: gnl-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend/data:/app/data
+    depends_on:
+      - neo4j
+      - redis
+      - qdrant
+      - kafka
+    networks:
+      - gnl-network
+    restart: unless-stopped
+
+  # ========================================================
+  # FRONTEND (Next.js) - BIEN ALIGNÉ AVEC backend
+  # ========================================================
+  frontend:
+    build: ./frontend
+    container_name: gnl-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+      - NODE_ENV=development
+    depends_on:
+      - backend
+    networks:
+      - gnl-network
+    restart: unless-stopped
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
+  neo4j_import:
+  qdrant_storage:
+  kafka_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  gnl-network:
+    driver: bridge

@@ -1,0 +1,76 @@
+# ============================================================================
+# Kustomization - Environnement de Développement
+# ============================================================================
+# Description: Configuration pour l'environnement de développement
+# Utilisation: kubectl apply -k deploy/kubernetes/overlays/dev/
+# ============================================================================
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# ---------- Ressources de base ----------
+resources:
+  - ../../base/namespace.yaml
+  - ../../services/neo4j/deployment.yaml
+  - ../../services/neo4j/service.yaml
+  - ../../services/neo4j/persistent-volume.yaml
+  - ../../services/qdrant/deployment.yaml
+  - ../../services/qdrant/service.yaml
+  - ../../services/kafka/deployment.yaml
+  - ../../services/kafka/service.yaml
+  - ../../services/redis/deployment.yaml
+  - ../../services/redis/service.yaml
+  - ../../services/api/deployment.yaml
+  - ../../services/api/service.yaml
+  - ../../services/agents/deployment.yaml
+  - ../../services/agents/service.yaml
+  - ../../services/agents/hpa.yaml
+
+# ---------- Patches ----------
+patchesStrategicMerge:
+  - patches/neo4j-dev-patch.yaml
+  - patches/api-dev-patch.yaml
+  - patches/agents-dev-patch.yaml
+  - patches/resources-dev-patch.yaml
+
+# ---------- Images ----------
+images:
+  - name: gnl-api
+    newName: gnl-api
+    newTag: dev-latest
+  - name: gnl-agent
+    newName: gnl-agent
+    newTag: dev-latest
+  - name: gnl-ingestion
+    newName: gnl-ingestion
+    newTag: dev-latest
+  - name: gnl-transform
+    newName: gnl-transform
+    newTag: dev-latest
+
+# ---------- ConfigMap ----------
+configMapGenerator:
+  - name: gnl-config-dev
+    behavior: merge
+    literals:
+      - ENV=dev
+      - LOG_LEVEL=DEBUG
+      - NEO4J_dbms_memory_heap_initial__size=256m
+      - NEO4J_dbms_memory_heap_max__size=1g
+      - API_REPLICAS=1
+      - AGENT_REPLICAS=1
+      - FEATURE_GRAPH_RAG=true
+      - FEATURE_AUTO_INGESTION=true
+
+# ---------- Namespace ----------
+namespace: gnl-knowledge-graph
+
+# ---------- Labels ----------
+commonLabels:
+  environment: dev
+  managed-by: kustomize
+
+# ---------- Annotations ----------
+commonAnnotations:
+  environment: dev
+  description: "GNL Knowledge Graph - Environnement de développement"

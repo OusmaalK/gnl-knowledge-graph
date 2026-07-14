@@ -1,0 +1,167 @@
+# =============================================================================
+# GNL Knowledge Graph - Requirements
+# Version: 1.0.0 (Corrigée)
+# Python: 3.11+
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Infrastructure - Bases de données et messagerie
+# -----------------------------------------------------------------------------
+neo4j==5.14.0
+qdrant-client==1.7.0
+redis==4.6.0
+kafka-python==2.0.2
+aiokafka==0.8.0
+paho-mqtt==1.6.1
+
+# -----------------------------------------------------------------------------
+# Data Processing - Traitement des données
+# -----------------------------------------------------------------------------
+pandas==2.0.3
+numpy==1.24.3
+pydantic==2.4.2
+pydantic-settings==2.0.3
+pyarrow==12.0.1
+dask==2023.10.1
+ray==2.7.1
+python-multipart==0.0.6
+
+# -----------------------------------------------------------------------------
+# LLM & AI - Modèles de langage et intelligence artificielle
+# -----------------------------------------------------------------------------
+langchain==0.0.340
+langgraph==0.0.15
+langchain-community==0.0.10
+langchain-core==0.0.10
+ollama==0.1.0
+sentence-transformers==2.2.2
+transformers==4.35.2
+torch==2.0.1
+torchvision==0.15.2
+torchaudio==2.0.2
+accelerate==0.24.1
+peft==0.6.2
+bitsandbytes==0.41.3
+xformers==0.0.22
+
+# -----------------------------------------------------------------------------
+# API & Web - Services REST et interfaces
+# -----------------------------------------------------------------------------
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+aiofiles==23.2.1
+httpx==0.25.1
+aiohttp==3.9.1
+websockets==12.0
+
+# -----------------------------------------------------------------------------
+# Orchestration - Workflows et pipelines
+# -----------------------------------------------------------------------------
+apache-airflow==2.7.3
+apache-airflow-providers-apache-kafka==1.0.0
+apache-airflow-providers-neo4j==1.0.0
+kubernetes==26.1.0
+
+# -----------------------------------------------------------------------------
+# Observability - Monitoring et logging
+# -----------------------------------------------------------------------------
+prometheus-client==0.17.1
+opentelemetry-api==1.21.0
+opentelemetry-sdk==1.21.0
+opentelemetry-exporter-otlp==1.21.0
+opentelemetry-instrumentation-fastapi==0.42b0
+opentelemetry-instrumentation-sqlalchemy==0.42b0
+structlog==23.2.0
+python-json-logger==2.0.7
+grafana-api==3.2.0
+
+# -----------------------------------------------------------------------------
+# Utils - Utilitaires et outils généraux
+# -----------------------------------------------------------------------------
+python-dotenv==1.0.0
+click==8.1.7
+tenacity==8.2.3
+PyYAML==6.0.1
+jsonschema==4.19.2
+deepdiff==6.7.1
+networkx==3.1
+matplotlib==3.7.3
+seaborn==0.12.2
+tqdm==4.66.1
+colorama==0.4.6
+tabulate==0.9.0
+rich==13.6.0
+typer==0.9.0
+
+# -----------------------------------------------------------------------------
+# Database Connectors - Connecteurs spécifiques
+# -----------------------------------------------------------------------------
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+asyncpg==0.29.0
+mysql-connector-python==8.2.0
+
+# -----------------------------------------------------------------------------
+# Cloud & Storage - Stockage cloud
+# -----------------------------------------------------------------------------
+boto3==1.33.13
+s3fs==2023.10.0
+minio==7.1.16
+
+# -----------------------------------------------------------------------------
+# Documentation & Notebooks
+# -----------------------------------------------------------------------------
+jupyter==1.0.0
+jupyterlab==4.0.9
+notebook==7.0.6
+ipython==8.17.2
+ipykernel==6.26.0
+nbconvert==7.10.0
+nbformat==5.9.2
+
+# -----------------------------------------------------------------------------
+# Testing - Tests unitaires et d'intégration
+# -----------------------------------------------------------------------------
+pytest==7.4.3
+pytest-cov==4.1.0
+pytest-asyncio==0.21.1
+pytest-mock==3.12.0
+pytest-xdist==3.5.0
+pytest-timeout==2.2.0
+pytest-html==4.1.1
+pytest-env==1.1.3
+factory-boy==3.3.0
+faker==20.1.0
+coverage==7.3.2
+tox==4.11.4
+
+# -----------------------------------------------------------------------------
+# Development - Outils de développement
+# -----------------------------------------------------------------------------
+black==23.12.1
+isort==5.12.0
+flake8==6.1.0
+mypy==1.7.1
+pre-commit==3.5.0
+ruff==0.1.6
+pylint==3.0.3
+bandit==1.7.5
+safety==2.3.5
+vulture==2.9.1
+darglint==1.8.1
+autoflake==2.2.1
+yapf==0.40.2
+
+
+# -----------------------------------------------------------------------------
+# Security - Sécurité et chiffrement
+# -----------------------------------------------------------------------------
+cryptography==41.0.7
+jwt==1.3.1
+python-jose==3.3.0
+passlib==1.7.4
+bcrypt==4.1.2
+python-argon2==0.1.0

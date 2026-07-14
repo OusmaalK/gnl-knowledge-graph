@@ -1,0 +1,60 @@
+# ============================================================================
+# RELATION : LIVRE_A
+# ============================================================================
+# Définition de la relation entre un méthanier et un terminal
+# ============================================================================
+
+relationship:
+  name: "LIVRE_A"
+  description: "Un méthanier livre à un terminal"
+  
+  # ---------- Cardinalité ----------
+  source: "Méthanier"
+  target: "Terminal"
+  cardinality: "N:1"
+  
+  # ---------- Visualisation ----------
+  visualization:
+    color: "#8B5CF6"
+    style: "solid"
+    width: 3
+    label: "livre à"
+  
+  # ---------- Propriétés ----------
+  properties:
+    - name: "date"
+      type: "datetime"
+      required: true
+      description: "Date de livraison"
+      example: "2026-07-10T12:00:00Z"
+    
+    - name: "quantite"
+      type: "integer"
+      required: false
+      min: 0
+      description: "Quantité livrée en m³"
+      example: 150000
+    
+    - name: "statut"
+      type: "enum"
+      required: false
+      enum_values: ["planifie", "en_cours", "termine", "annule"]
+      default: "planifie"
+      description: "Statut de la livraison"
+      example: "termine"
+    
+    - name: "certificat"
+      type: "string"
+      required: false
+      description: "Référence du certificat de livraison"
+      example: "CERT-2026-001"
+  
+  # ---------- Exemples ----------
+  examples:
+    - source: "METH-001"
+      target: "TERM-001"
+      properties:
+        date: "2026-07-10T12:00:00Z"
+        quantite: 150000
+        statut: "termine"
+        certificat: "CERT-2026-001"

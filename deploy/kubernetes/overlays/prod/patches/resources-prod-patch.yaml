@@ -1,0 +1,36 @@
+# ============================================================================
+# Patch Resources - Production
+# ============================================================================
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: neo4j-data-pvc
+  namespace: gnl-knowledge-graph
+spec:
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: ssd
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: qdrant-storage-pvc
+  namespace: gnl-knowledge-graph
+spec:
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: ssd
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data-pvc
+  namespace: gnl-knowledge-graph
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: ssd

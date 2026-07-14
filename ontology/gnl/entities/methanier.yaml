@@ -1,0 +1,108 @@
+# ============================================================================
+# ENTITÉ : MÉTHANIER
+# ============================================================================
+# Définition du type de nœud Méthanier
+# ============================================================================
+
+entity:
+  name: "Méthanier"
+  description: "Navire de transport de GNL"
+  inherits: "NamedEntity"
+  
+  # ---------- Visualisation ----------
+  visualization:
+    color: "#8B5CF6"
+    icon: "ship"
+    shape: "roundrectangle"
+    size: 55
+  
+  # ---------- Propriétés ----------
+  properties:
+    - name: "id"
+      type: "string"
+      required: true
+      pattern: "^METH-\\d{3,4}$"
+      description: "Identifiant unique du méthanier"
+      example: "METH-001"
+    
+    - name: "nom"
+      type: "string"
+      required: true
+      description: "Nom du méthanier"
+      example: "GNL Explorer"
+    
+    - name: "type_navire"
+      type: "enum"
+      required: true
+      enum_values: ["Méthanier", "LNG Carrier", "FLNG"]
+      default: "Méthanier"
+      description: "Type de navire"
+    
+    - name: "capacite_m3"
+      type: "integer"
+      required: true
+      min: 0
+      description: "Capacité en mètres cubes"
+      example: 150000
+    
+    - name: "statut"
+      type: "enum"
+      required: true
+      enum_values: ["en_croisiere", "a_quai", "en_chargement", "en_dechargement"]
+      default: "en_croisiere"
+      description: "Statut du méthanier"
+      example: "en_croisiere"
+    
+    - name: "port_actuel"
+      type: "string"
+      required: false
+      description: "Port actuel du méthanier"
+      example: "Fos-sur-Mer"
+    
+    - name: "latitude"
+      type: "float"
+      required: false
+      min: -90
+      max: 90
+      description: "Latitude du méthanier"
+      example: 43.43
+    
+    - name: "longitude"
+      type: "float"
+      required: false
+      min: -180
+      max: 180
+      description: "Longitude du méthanier"
+      example: 4.87
+    
+    - name: "vitesse_noeuds"
+      type: "float"
+      required: false
+      min: 0
+      description: "Vitesse en nœuds"
+      example: 15.5
+    
+    - name: "cap_deg"
+      type: "float"
+      required: false
+      min: 0
+      max: 360
+      description: "Cap en degrés"
+      example: 180
+    
+    - name: "created_at"
+      type: "datetime"
+      required: false
+      description: "Date de création"
+    
+    - name: "updated_at"
+      type: "datetime"
+      required: false
+      description: "Date de dernière mise à jour"
+  
+  # ---------- Relations ----------
+  relationships:
+    - type: "LIVRE_A"
+      target: "Terminal"
+      cardinality: "N:1"
+      description: "Un méthanier livre à un terminal"

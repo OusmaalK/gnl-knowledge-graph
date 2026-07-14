@@ -1,0 +1,151 @@
+# ============================================================================
+# AGENT : PREDIRE RISQUE
+# ============================================================================
+# Définition de l'outil de prédiction des risques pour les agents IA
+# ============================================================================
+
+tool:
+  name: "predire_risque"
+  description: "Prédit les risques pour un équipement ou un pipeline"
+  agent_type: "maintenance"
+  
+  # ---------- Paramètres ----------
+  parameters:
+    - name: "equipment_id"
+      type: "string"
+      required: true
+      description: "ID de l'équipement à analyser"
+      example: "PIPE-001"
+    
+    - name: "timeframe"
+      type: "integer"
+      required: false
+      default: 30
+      description: "Période de prédiction en jours"
+  
+  # ---------- Requêtes Cypher ----------
+  cypher_queries:
+    # Score de risque
+    risk_score: |
+      MATCH (e {id: $equipment_id})
+      OPTIONAL MATCH (i:Incident)-[:AFFECTE]->(e)
+      OPTIONAL MATCH (e)-[:DESSERT]->(c:Client)
+      RETURN 
+        e.id as equipment_id,
+        e.nom as equipment_name,
+        labels(e)[0] as equipment_type,
+        e.statut as statut,
+        count(DISTINCT i) as incidents_count,
+        count(DISTINCT c) as clients_count,
+        collect(DISTINCT i.gravite) as gravites,
+        collect(DISTINCT i.cause) as causes
+      LIMIT 1
+    
+    # Historique des incidents
+    incident_history: |
+      MATCH (i:Incident)-[:AFFECTE]->(e {id: $equipment_id})
+      RETURN 
+        i.id as id,
+        i.gravite as gravite,
+        i.date as date,
+        i.cause as cause,
+        i.duree_min as duree
+      ORDER BY i.date DESC
+      LIMIT 10
+    
+    # Facteurs de risque
+    risk_factors: |
+      MATCH (e {id: $equipment_id})
+      OPTIONAL MATCH (e)-[:DEPEND_DE]->(comp:Compresseur)
+      OPTIONAL MATCH (e)-[:DESSERT]->(c:Client)
+      RETURN 
+        count(DISTINCT comp) as dependencies,
+        count(DISTINCT c) as clients,
+        e.statut as statut
+      LIMIT 1
+  
+  # ---------- Calcul du risque ----------
+  risk_calculation:
+    formula: |
+      score = 20  # Score de base
+      
+      # Facteur incidents
+      IF incidents_count >= 3:
+          score += 40
+      ELSE IF incidents_count >= 1:
+          score += 20
+      
+      # Facteur clients
+      IF clients_count > 0:
+          score += 10
+      
+      # Facteur dépendances
+      IF dependencies > 0:
+          score += 10
+      
+      # Facteur statut
+      IF statut == "maintenance":
+          score += 20
+      ELSE IF statut == "hors_service":
+          score += 30
+      
+      # Facteur gravité
+      IF "critique" IN gravites:
+          score += 20
+      ELSE IF "majeur" IN gravites:
+          score += 10
+      
+      # Niveau de risque
+      IF score >= 70: niveau = "CRITIQUE"
+      ELSE IF score >= 50: niveau = "ELEVE"
+      ELSE IF score >= 30: niveau = "MOYEN"
+      ELSE: niveau = "FAIBLE"
+  
+  # ---------- Réponse ----------
+  response_template: |
+    ⚠️ PRÉDICTION DE RISQUE
+    
+    📊 ANALYSE :
+    - Équipement : {equipment_name} ({equipment_id})
+    - Type : {equipment_type}
+    - Statut : {statut}
+    - Incidents : {incidents_count}
+    - Clients : {clients_count}
+    - Dépendances : {dependencies}
+    
+    📈 SCORE DE RISQUE : {score}/100
+    🎯 NIVEAU : {niveau}
+    
+    📋 FACTEURS DE RISQUE :
+    {risk_factors_list}
+    
+    💡 RECOMMANDATIONS :
+    {recommendations}
+  
+  # ---------- Exemple ----------
+  example:
+    input:
+      equipment_id: "PIPE-001"
+    output: |
+      ⚠️ PRÉDICTION DE RISQUE
+      
+      📊 ANALYSE :
+      - Équipement : Nord-Sud (PIPE-001)
+      - Type : Pipeline
+      - Statut : actif
+      - Incidents : 1
+      - Clients : 1
+      - Dépendances : 1
+      
+      📈 SCORE DE RISQUE : 60/100
+      🎯 NIVEAU : ELEVE
+      
+      📋 FACTEURS DE RISQUE :
+      - 1 incident critique (corrosion)
+      - 1 client impacté
+      - Dépendance critique (Compresseur Nord)
+      
+      💡 RECOMMANDATIONS :
+      1. Planifier une inspection dans les 30 jours
+      2. Renforcer le monitoring
+      3. Préparer un plan de continuité

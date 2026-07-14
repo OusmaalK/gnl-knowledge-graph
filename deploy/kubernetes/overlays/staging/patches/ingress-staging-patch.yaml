@@ -1,0 +1,27 @@
+# ============================================================================
+# Patch Ingress - Staging
+# ============================================================================
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gnl-api-ingress
+  namespace: gnl-knowledge-graph
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+spec:
+  tls:
+  - hosts:
+    - staging-api.gnl-knowledge-graph.com
+    secretName: gnl-api-tls-staging
+  rules:
+  - host: staging-api.gnl-knowledge-graph.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: api-service
+            port:
+              number: 8000

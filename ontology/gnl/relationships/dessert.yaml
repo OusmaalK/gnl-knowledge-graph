@@ -1,0 +1,59 @@
+# ============================================================================
+# RELATION : DESSERT
+# ============================================================================
+# Définition de la relation entre un pipeline et un client
+# ============================================================================
+
+relationship:
+  name: "DESSERT"
+  description: "Un pipeline dessert un client"
+  
+  # ---------- Cardinalité ----------
+  source: "Pipeline"
+  target: "Client"
+  cardinality: "1:N"
+  
+  # ---------- Visualisation ----------
+  visualization:
+    color: "#EF4444"
+    style: "solid"
+    width: 3
+    label: "dessert"
+  
+  # ---------- Propriétés ----------
+  properties:
+    - name: "volume"
+      type: "integer"
+      required: true
+      min: 0
+      description: "Volume distribué en m³"
+      example: 200
+    
+    - name: "contrat"
+      type: "string"
+      required: false
+      description: "Référence du contrat"
+      example: "GNL-2026-001"
+    
+    - name: "date_debut"
+      type: "datetime"
+      required: false
+      description: "Date de début de la desserte"
+      example: "2026-01-01T00:00:00Z"
+    
+    - name: "statut"
+      type: "enum"
+      required: false
+      enum_values: ["actif", "suspendu", "termine"]
+      default: "actif"
+      description: "Statut de la desserte"
+  
+  # ---------- Exemples ----------
+  examples:
+    - source: "PIPE-001"
+      target: "CLIENT-001"
+      properties:
+        volume: 200
+        contrat: "GNL-2026-001"
+        date_debut: "2026-01-01T00:00:00Z"
+        statut: "actif"

@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: gnl-backend
+    runtime: image
+    repo: https://github.com/VOTRE_NOM_UTILISATEUR/gnl-knowledge-graph.git
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    envVars:
+      - key: NEO4J_URI
+        value: bolt://neo4j:7687
+      - key: NEO4J_USER
+        value: neo4j
+      - key: NEO4J_PASSWORD
+        value: GnL_Neo4j_2026_Secure!

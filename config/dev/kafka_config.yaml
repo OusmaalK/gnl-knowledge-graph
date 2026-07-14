@@ -1,0 +1,73 @@
+# ============================================================================
+# Kafka Configuration - Développement
+# ============================================================================
+# Description: Configuration de Kafka pour l'environnement de développement
+# ============================================================================
+
+kafka:
+  # Serveurs
+  bootstrap_servers: "localhost:9092"
+  
+  # Groupes
+  group_id: "gnl-dev-group"
+  auto_offset_reset: "earliest"
+  
+  # Production
+  producer:
+    acks: "all"
+    retries: 3
+    batch_size: 16384
+    linger_ms: 10
+    compression_type: "snappy"
+    max_in_flight_requests_per_connection: 1
+  
+  # Consommation
+  consumer:
+    enable_auto_commit: true
+    auto_commit_interval_ms: 5000
+    max_poll_records: 500
+    session_timeout_ms: 10000
+    heartbeat_interval_ms: 3000
+  
+  # Topics
+  topics:
+    gnl_iot:
+      partitions: 3
+      replication_factor: 1
+      config:
+        cleanup_policy: "delete"
+        retention_ms: 604800000
+        compression_type: "snappy"
+        segment_bytes: 1073741824
+    
+    gnl_tracking:
+      partitions: 2
+      replication_factor: 1
+      config:
+        cleanup_policy: "delete"
+        retention_ms: 259200000
+        compression_type: "snappy"
+    
+    gnl_incidents:
+      partitions: 2
+      replication_factor: 1
+      config:
+        cleanup_policy: "delete"
+        retention_ms: 31536000000
+        compression_type: "snappy"
+    
+    gnl_pipelines:
+      partitions: 2
+      replication_factor: 1
+      config:
+        cleanup_policy: "delete"
+        retention_ms: 604800000
+        compression_type: "snappy"
+    
+    gnl_orders:
+      partitions: 2
+      replication_factor: 1
+      config:
+        cleanup_policy: "delete"
+        retention_ms: 31536000000
+        compression_type: "snappy"

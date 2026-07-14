@@ -1,0 +1,68 @@
+# ============================================================================
+# Neo4j Configuration - Développement
+# ============================================================================
+# Description: Configuration de Neo4j pour l'environnement de développement
+# ============================================================================
+
+neo4j:
+  # Connexion
+  uri: "bolt://localhost:7687"
+  user: "neo4j"
+  password: "${NEO4J_PASSWORD}"
+  
+  # Pool de connexions
+  connection_pool:
+    max_size: 10
+    acquisition_timeout: 30
+    idle_timeout: 60
+    max_lifetime: 3600
+  
+  # Performance
+  performance:
+    fetch_size: 1000
+    max_transaction_retry_time: 30
+    retry_delay: 1
+  
+  # Memory
+  memory:
+    heap_initial_size: "256m"
+    heap_max_size: "1g"
+    pagecache_size: "512m"
+  
+  # Plugins
+  plugins:
+    - "apoc"
+    - "bloom"
+    - "graph-data-science"
+  
+  # Indexes
+  indexes:
+    - label: "Fournisseur"
+      properties: ["id"]
+    - label: "Terminal"
+      properties: ["id"]
+    - label: "Pipeline"
+      properties: ["id"]
+    - label: "Incident"
+      properties: ["id"]
+    - label: "Client"
+      properties: ["id"]
+    - label: "Compresseur"
+      properties: ["id"]
+    - label: "Stockage"
+      properties: ["id"]
+  
+  # Constraints
+  constraints:
+    - label: "Fournisseur"
+      property: "id"
+      type: "unique"
+    - label: "Terminal"
+      property: "id"
+      type: "unique"
+    - label: "Pipeline"
+      property: "id"
+      type: "unique"
+    - label: "Incident"
+      property: "id"
+      type: "unique"

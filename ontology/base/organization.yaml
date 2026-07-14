@@ -1,0 +1,70 @@
+# ============================================================================
+# ONTOLOGIE - ORGANISATION
+# ============================================================================
+# Définition des concepts liés aux organisations
+# ============================================================================
+
+ontology:
+  name: "Organization Ontology"
+  version: "1.0.0"
+  description: "Concepts liés aux organisations"
+
+# ============================================================================
+# TYPES D'ORGANISATIONS
+# ============================================================================
+
+organization_types:
+  # Représente une organisation
+  Organisation:
+    extends: "NamedEntity"
+    description: "Organisation"
+    properties:
+      - name: "nom"
+        type: "string"
+        required: true
+        description: "Nom de l'organisation"
+      - name: "sigle"
+        type: "string"
+        required: false
+        description: "Sigle de l'organisation"
+      - name: "type"
+        type: "enum"
+        required: true
+        description: "Type d'organisation"
+        enum_values: ["entreprise", "association", "administration", "autre"]
+      - name: "secteur"
+        type: "string"
+        required: false
+        description: "Secteur d'activité"
+      - name: "site_web"
+        type: "string"
+        required: false
+        description: "Site web de l'organisation"
+  
+  # Représente une équipe
+  Equipe:
+    extends: "Organisation"
+    description: "Équipe de travail"
+    properties:
+      - name: "specialite"
+        type: "string"
+        required: true
+        description: "Spécialité de l'équipe"
+      - name: "taille"
+        type: "integer"
+        required: false
+        description: "Nombre de membres"
+      - name: "disponible"
+        type: "boolean"
+        required: false
+        description: "Disponibilité de l'équipe"
+  
+  # Représente un service
+  Service:
+    extends: "Organisation"
+    description: "Service d'une organisation"
+    properties:
+      - name: "responsable"
+        type: "string"
+        required: false
+        description: "Responsable du service"

@@ -1,0 +1,107 @@
+# ============================================================================
+# ENTITÉ : TERMINAL
+# ============================================================================
+# Définition du type de nœud Terminal
+# ============================================================================
+
+entity:
+  name: "Terminal"
+  description: "Terminal de réception et distribution de GNL"
+  inherits: "SiteIndustriel"
+  
+  # ---------- Visualisation ----------
+  visualization:
+    color: "#10B981"
+    icon: "terminal"
+    shape: "roundrectangle"
+    size: 60
+  
+  # ---------- Propriétés ----------
+  properties:
+    - name: "id"
+      type: "string"
+      required: true
+      pattern: "^TERM-\\d{3,4}$"
+      description: "Identifiant unique du terminal"
+      example: "TERM-001"
+    
+    - name: "nom"
+      type: "string"
+      required: true
+      description: "Nom du terminal"
+      example: "Fos-sur-Mer"
+    
+    - name: "localisation"
+      type: "string"
+      required: false
+      description: "Localisation du terminal"
+      example: "Marseille"
+    
+    - name: "capacite_m3"
+      type: "integer"
+      required: true
+      min: 0
+      description: "Capacité en mètres cubes"
+      example: 500000
+    
+    - name: "type"
+      type: "enum"
+      required: true
+      enum_values: ["LNG", "CNG", "LPG"]
+      default: "LNG"
+      description: "Type de terminal"
+      example: "LNG"
+    
+    - name: "statut"
+      type: "enum"
+      required: true
+      enum_values: ["actif", "en_construction", "maintenance", "hors_service"]
+      default: "actif"
+      description: "Statut du terminal"
+      example: "actif"
+    
+    - name: "latitude"
+      type: "float"
+      required: false
+      min: -90
+      max: 90
+      description: "Latitude du terminal"
+    
+    - name: "longitude"
+      type: "float"
+      required: false
+      min: -180
+      max: 180
+      description: "Longitude du terminal"
+    
+    - name: "created_at"
+      type: "datetime"
+      required: false
+      description: "Date de création"
+    
+    - name: "updated_at"
+      type: "datetime"
+      required: false
+      description: "Date de dernière mise à jour"
+  
+  # ---------- Relations ----------
+  relationships:
+    - type: "FOURNIT"
+      target: "Fournisseur"
+      cardinality: "N:M"
+      description: "Un terminal est approvisionné par des fournisseurs"
+    
+    - type: "LIVRE_A"
+      target: "Méthanier"
+      cardinality: "1:N"
+      description: "Un terminal reçoit des livraisons de méthaniers"
+    
+    - type: "ALIMENTE"
+      target: "Pipeline"
+      cardinality: "1:N"
+      description: "Un terminal alimente des pipelines"
+    
+    - type: "STOCKE"
+      target: "Stockage"
+      cardinality: "1:N"
+      description: "Un terminal stocke dans des installations"

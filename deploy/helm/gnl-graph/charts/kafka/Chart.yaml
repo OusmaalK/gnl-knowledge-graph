@@ -1,0 +1,37 @@
+# ============================================================================
+# Chart Kafka pour GNL Graph
+# ============================================================================
+# Utilisation: helm dependency update
+# ============================================================================
+
+apiVersion: v2
+name: kafka
+description: Apache Kafka pour le streaming de données GNL
+type: application
+version: 23.0.0
+appVersion: 3.4.0
+
+keywords:
+  - kafka
+  - message-queue
+  - streaming
+  - event-driven
+  - gnl
+
+home: https://kafka.apache.org/
+sources:
+  - https://github.com/apache/kafka
+  - https://github.com/bitnami/charts/tree/main/bitnami/kafka
+
+maintainers:
+  - name: GNL Team
+    email: team@gnl-company.com
+
+annotations:
+  category: Infrastructure
+  license: Apache-2.0
+  artifacthub.io/containsSecurityUpdates: "true"
+  artifacthub.io/changes: |
+    - kind: changed
+      description: "Mise à jour vers Kafka 3.4.0"
+  artifacthub.io/operator: "false"

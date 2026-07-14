@@ -1,0 +1,76 @@
+# ============================================================================
+# ENTITÉ : COMPRESSEUR
+# ============================================================================
+# Définition du type de nœud Compresseur
+# ============================================================================
+
+entity:
+  name: "Compresseur"
+  description: "Compresseur de gaz"
+  inherits: "NamedEntity"
+  
+  # ---------- Visualisation ----------
+  visualization:
+    color: "#EC4899"
+    icon: "compressor"
+    shape: "roundrectangle"
+    size: 50
+  
+  # ---------- Propriétés ----------
+  properties:
+    - name: "id"
+      type: "string"
+      required: true
+      pattern: "^COMP-\\d{3,4}$"
+      description: "Identifiant unique du compresseur"
+      example: "COMP-001"
+    
+    - name: "nom"
+      type: "string"
+      required: true
+      description: "Nom du compresseur"
+      example: "Compresseur Nord"
+    
+    - name: "puissance"
+      type: "integer"
+      required: true
+      min: 0
+      description: "Puissance en kW"
+      example: 100
+    
+    - name: "type"
+      type: "enum"
+      required: false
+      enum_values: ["centrifuge", "alternatif", "rotatif"]
+      default: "centrifuge"
+      description: "Type de compresseur"
+    
+    - name: "statut"
+      type: "enum"
+      required: true
+      enum_values: ["actif", "maintenance", "hors_service"]
+      default: "actif"
+      description: "Statut du compresseur"
+      example: "actif"
+    
+    - name: "created_at"
+      type: "datetime"
+      required: false
+      description: "Date de création"
+    
+    - name: "updated_at"
+      type: "datetime"
+      required: false
+      description: "Date de dernière mise à jour"
+  
+  # ---------- Relations ----------
+  relationships:
+    - type: "DEPEND_DE"
+      target: "Pipeline"
+      cardinality: "N:M"
+      description: "Un compresseur est lié à des pipelines"
+    
+    - type: "AFFECTE"
+      target: "Incident"
+      cardinality: "1:N"
+      description: "Un compresseur est affecté par des incidents"

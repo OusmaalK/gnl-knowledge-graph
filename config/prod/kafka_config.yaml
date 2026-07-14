@@ -1,0 +1,87 @@
+# ============================================================================
+# Kafka Configuration - Production
+# ============================================================================
+# Description: Configuration de Kafka pour l'environnement de production
+# ============================================================================
+
+kafka:
+  # Serveurs
+  bootstrap_servers: "kafka-service:9092"
+  
+  # Groupes
+  group_id: "gnl-prod-group"
+  auto_offset_reset: "earliest"
+  
+  # Production
+  producer:
+    acks: "all"
+    retries: 5
+    batch_size: 65536
+    linger_ms: 20
+    compression_type: "snappy"
+    max_in_flight_requests_per_connection: 1
+    enable_idempotence: true
+  
+  # Consommation
+  consumer:
+    enable_auto_commit: true
+    auto_commit_interval_ms: 10000
+    max_poll_records: 1000
+    session_timeout_ms: 30000
+    heartbeat_interval_ms: 10000
+    max_poll_interval_ms: 300000
+  
+  # Topics
+  topics:
+    gnl_iot:
+      partitions: 12
+      replication_factor: 3
+      config:
+        cleanup_policy: "delete"
+        retention_ms: 604800000
+        compression_type: "snappy"
+        segment_bytes: 1073741824
+        min_insync_replicas: 2
+    
+    gnl_tracking:
+      partitions: 8
+      replication_factor: 3
+      config:
+        cleanup_policy: "delete"
+        retention_ms: 259200000
+        compression_type: "snappy"
+        min_insync_replicas: 2
+    
+    gnl_incidents:
+      partitions: 6
+      replication_factor: 3
+      config:
+        cleanup_policy: "delete"
+        retention_ms: 31536000000
+        compression_type: "snappy"
+        min_insync_replicas: 2
+    
+    gnl_pipelines:
+      partitions: 6
+      replication_factor: 3
+      config:
+        cleanup_policy: "delete"
+        retention_ms: 604800000
+        compression_type: "snappy"
+        min_insync_replicas: 2
+    
+    gnl_orders:
+      partitions: 6
+      replication_factor: 3
+      config:
+        cleanup_policy: "delete"
+        retention_ms: 31536000000
+        compression_type: "snappy"
+        min_insync_replicas: 2
+  
+  # Monitoring
+  monitoring:
+    enabled: true
+    metrics:
+      port: 9092
+      path: "/metrics"

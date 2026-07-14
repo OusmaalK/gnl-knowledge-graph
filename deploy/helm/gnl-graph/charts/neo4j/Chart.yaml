@@ -1,0 +1,55 @@
+# ============================================================================
+# Chart Neo4j pour GNL Graph
+# ============================================================================
+# Utilisation: helm dependency update
+# ============================================================================
+
+apiVersion: v2
+name: neo4j
+description: Neo4j - Base de données graphe pour GNL Knowledge Graph
+type: application
+version: 5.14.0
+appVersion: 5.14.0
+
+keywords:
+  - neo4j
+  - graph-database
+  - database
+  - graph
+  - nosql
+  - gnl
+
+home: https://neo4j.com/
+sources:
+  - https://github.com/neo4j/neo4j
+  - https://github.com/neo4j/helm-charts
+
+maintainers:
+  - name: GNL Team
+    email: team@gnl-company.com
+  - name: Neo4j Team
+    email: support@neo4j.com
+
+dependencies:
+  - name: apoc
+    version: 5.14.0
+    repository: https://neo4j.github.io/helm-charts
+    condition: apoc.enabled
+  - name: graph-data-science
+    version: 2.5.0
+    repository: https://neo4j.github.io/helm-charts
+    condition: graph-data-science.enabled
+
+annotations:
+  category: Database
+  license: GPL-3.0
+  artifacthub.io/containsSecurityUpdates: "true"
+  artifacthub.io/changes: |
+    - kind: changed
+      description: "Mise à jour vers Neo4j 5.14.0"
+  artifacthub.io/operator: "false"
+  artifacthub.io/links: |
+    - name: Documentation
+      url: https://neo4j.com/docs/
+    - name: Support
+      url: https://neo4j.com/support/

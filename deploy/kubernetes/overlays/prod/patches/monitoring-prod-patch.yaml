@@ -1,0 +1,43 @@
+# ============================================================================
+# Patch Monitoring - Production
+# ============================================================================
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gnl-monitoring-prod
+  namespace: gnl-knowledge-graph
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+    scrape_configs:
+    - job_name: 'gnl-api'
+      metrics_path: '/metrics'
+      static_configs:
+      - targets: ['api-service:8000']
+    - job_name: 'gnl-agents'
+      static_configs:
+      - targets: ['agents-service:8001']
+    - job_name: 'neo4j'
+      static_configs:
+      - targets: ['neo4j-service:7474']
+    - job_name: 'qdrant'
+      static_configs:
+      - targets: ['qdrant-service:6333']
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gnl-grafana-prod
+  namespace: gnl-knowledge-graph
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus-service:9090
+      access: proxy
+      isDefault: true

@@ -1,0 +1,92 @@
+# Règles d'alertes pour le système GNL
+
+rules:
+  # --- Alertes API ---
+  - name: api_high_error_rate
+    description: "Taux d'erreur API élevé"
+    condition: "api_errors_total / api_requests_total > 0.05"
+    severity: "critical"
+    action: "notify_slack"
+    message: "Le taux d'erreur API est de {value:.2%}"
+    
+  - name: api_slow_response
+    description: "Temps de réponse API lent"
+    condition: "api_request_duration_seconds_avg > 5"
+    severity: "warning"
+    action: "log"
+    message: "Le temps de réponse API est de {value:.2f}s"
+    
+  # --- Alertes Base de données ---
+  - name: neo4j_high_query_time
+    description: "Requêtes Neo4j lentes"
+    condition: "graph_query_duration_seconds_avg > 10"
+    severity: "warning"
+    action: "notify_slack"
+    message: "Le temps moyen des requêtes Neo4j est de {value:.2f}s"
+    
+  - name: neo4j_query_errors
+    description: "Erreurs de requêtes Neo4j"
+    condition: "graph_queries_errors > 10"
+    severity: "critical"
+    action: "notify_email"
+    message: "{value} erreurs de requêtes Neo4j détectées"
+    
+  # --- Alertes Agents ---
+  - name: agent_high_error_rate
+    description: "Taux d'erreur des agents élevé"
+    condition: "agent_errors_total / agent_calls_total > 0.1"
+    severity: "critical"
+    action: "notify_slack"
+    message: "Le taux d'erreur des agents est de {value:.2%}"
+    
+  - name: agent_slow_response
+    description: "Réponse des agents lente"
+    condition: "agent_duration_seconds_avg > 30"
+    severity: "warning"
+    action: "log"
+    message: "Le temps de réponse des agents est de {value:.2f}s"
+    
+  # --- Alertes Cache ---
+  - name: cache_low_hit_rate
+    description: "Taux de cache faible"
+    condition: "cache_hits_total / cache_requests_total < 0.5"
+    severity: "warning"
+    action: "notify_slack"
+    message: "Le taux de cache est de {value:.2%}"
+    
+  # --- Alertes Ingestion ---
+  - name: ingestion_failure
+    description: "Échec d'ingestion de données"
+    condition: "ingestion_failures_total > 0"
+    severity: "critical"
+    action: "notify_email"
+    message: "{value} échecs d'ingestion de données"
+    
+  - name: ingestion_low_rate
+    description: "Taux d'ingestion faible"
+    condition: "ingestion_records_total < 100"
+    severity: "warning"
+    action: "log"
+    message: "Seulement {value} enregistrements ingérés"
+    
+  # --- Alertes Système ---
+  - name: system_high_memory
+    description: "Utilisation mémoire élevée"
+    condition: "system_memory_bytes > 0.8 * system_memory_limit"
+    severity: "critical"
+    action: "notify_slack"
+    message: "Utilisation mémoire de {value:.1%}"
+    
+  - name: system_high_cpu
+    description: "Utilisation CPU élevée"
+    condition: "system_cpu_percent > 80"
+    severity: "warning"
+    action: "notify_slack"
+    message: "Utilisation CPU de {value:.1f}%"
+    
+  - name: system_high_log_rate
+    description: "Taux de logs élevé"
+    condition: "log_rate > 1000"
+    severity: "warning"
+    action: "log"
+    message: "{value} logs par minute"

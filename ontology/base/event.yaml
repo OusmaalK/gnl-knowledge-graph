@@ -1,0 +1,89 @@
+# ============================================================================
+# ONTOLOGIE - ÉVÉNEMENT
+# ============================================================================
+# Définition des concepts liés aux événements
+# ============================================================================
+
+ontology:
+  name: "Event Ontology"
+  version: "1.0.0"
+  description: "Concepts liés aux événements"
+
+# ============================================================================
+# TYPES D'ÉVÉNEMENTS
+# ============================================================================
+
+event_types:
+  # Représente un événement
+  Evenement:
+    extends: "TemporalEntity"
+    description: "Événement"
+    properties:
+      - name: "date"
+        type: "datetime"
+        required: true
+        description: "Date de l'événement"
+      - name: "description"
+        type: "string"
+        required: true
+        description: "Description de l'événement"
+      - name: "type"
+        type: "enum"
+        required: true
+        description: "Type d'événement"
+        enum_values: ["incident", "maintenance", "operation", "administratif"]
+      - name: "statut"
+        type: "enum"
+        required: false
+        description: "Statut de l'événement"
+        enum_values: ["planifie", "en_cours", "termine", "annule"]
+  
+  # Représente un incident
+  Incident:
+    extends: "Evenement"
+    description: "Incident"
+    properties:
+      - name: "gravite"
+        type: "enum"
+        required: true
+        description: "Gravité de l'incident"
+        enum_values: ["critique", "majeur", "mineur"]
+      - name: "cause"
+        type: "string"
+        required: false
+        description: "Cause de l'incident"
+      - name: "action"
+        type: "string"
+        required: false
+        description: "Action entreprise"
+      - name: "duree_min"
+        type: "integer"
+        required: false
+        description: "Durée en minutes"
+  
+  # Représente une maintenance
+  Maintenance:
+    extends: "Evenement"
+    description: "Maintenance"
+    properties:
+      - name: "type"
+        type: "enum"
+        required: true
+        description: "Type de maintenance"
+        enum_values: ["preventive", "corrective", "predictive", "urgente"]
+      - name: "date_prevue"
+        type: "datetime"
+        required: false
+        description: "Date prévue"
+      - name: "date_realisee"
+        type: "datetime"
+        required: false
+        description: "Date réalisée"
+      - name: "cout_estime"
+        type: "float"
+        required: false
+        description: "Coût estimé"
+      - name: "cout_reel"
+        type: "float"
+        required: false
+        description: "Coût réel"

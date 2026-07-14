@@ -1,0 +1,237 @@
+# ============================================================================
+# ONTOLOGIE DE BASE
+# ============================================================================
+# Cette ontologie définit les concepts fondamentaux
+# Toutes les ontologies spécifiques héritent de ces concepts
+# ============================================================================
+
+ontology:
+  name: "Base Ontology"
+  version: "1.0.0"
+  description: "Ontologie de base pour le projet GNL"
+  
+# ============================================================================
+# CONCEPTS DE BASE
+# ============================================================================
+
+base_concepts:
+  # Toute entité identifiable
+  Entity:
+    description: "Entité de base identifiable"
+    properties:
+      - name: "id"
+        type: "string"
+        required: true
+        description: "Identifiant unique de l'entité"
+      - name: "created_at"
+        type: "datetime"
+        required: false
+        description: "Date de création"
+      - name: "updated_at"
+        type: "datetime"
+        required: false
+        description: "Date de dernière mise à jour"
+  
+  # Toute entité nommée
+  NamedEntity:
+    extends: "Entity"
+    description: "Entité avec un nom"
+    properties:
+      - name: "nom"
+        type: "string"
+        required: true
+        description: "Nom de l'entité"
+  
+  # Toute entité avec un statut
+  StatusEntity:
+    extends: "NamedEntity"
+    description: "Entité avec un statut"
+    properties:
+      - name: "statut"
+        type: "enum"
+        required: true
+        description: "Statut de l'entité"
+        enum_values: ["actif", "inactif", "maintenance", "hors_service"]
+  
+  # Toute entité géolocalisée
+  GeoEntity:
+    extends: "NamedEntity"
+    description: "Entité avec une localisation"
+    properties:
+      - name: "localisation"
+        type: "string"
+        required: false
+        description: "Localisation de l'entité"
+      - name: "latitude"
+        type: "float"
+        required: false
+        description: "Latitude"
+      - name: "longitude"
+        type: "float"
+        required: false
+        description: "Longitude"
+  
+  # Toute entité temporelle
+  TemporalEntity:
+    extends: "Entity"
+    description: "Entité avec une dimension temporelle"
+    properties:
+      - name: "date"
+        type: "datetime"
+        required: true
+        description: "Date de l'événement"
+      - name: "duree_min"
+        type: "integer"
+        required: false
+        description: "Durée en minutes"
+
+# ============================================================================
+# RELATIONS DE BASE
+# ============================================================================
+
+base_relationships:
+  # Relation d'appartenance
+  APPARTIENT_A:
+    description: "Relation d'appartenance"
+    source: "Entity"
+    target: "Entity"
+    cardinality: "N:1"
+  
+  # Relation de dépendance
+  DEPEND_DE:
+    description: "Relation de dépendance"
+    source: "Entity"
+    target: "Entity"
+    cardinality: "N:M"
+  
+  # Relation de localisation
+  SITUE_A:
+    description: "Relation de localisation"
+    source: "Entity"
+    target: "GeoEntity"
+    cardinality: "N:1"
+  
+  # Relation historique
+  HISTORIQUE:
+    description: "Relation historique"
+    source: "Entity"
+    target: "TemporalEntity"
+    cardinality: "1:N"# ============================================================================
+# ONTOLOGIE DE BASE
+# ============================================================================
+# Cette ontologie définit les concepts fondamentaux
+# Toutes les ontologies spécifiques héritent de ces concepts
+# ============================================================================
+
+ontology:
+  name: "Base Ontology"
+  version: "1.0.0"
+  description: "Ontologie de base pour le projet GNL"
+  
+# ============================================================================
+# CONCEPTS DE BASE
+# ============================================================================
+
+base_concepts:
+  # Toute entité identifiable
+  Entity:
+    description: "Entité de base identifiable"
+    properties:
+      - name: "id"
+        type: "string"
+        required: true
+        description: "Identifiant unique de l'entité"
+      - name: "created_at"
+        type: "datetime"
+        required: false
+        description: "Date de création"
+      - name: "updated_at"
+        type: "datetime"
+        required: false
+        description: "Date de dernière mise à jour"
+  
+  # Toute entité nommée
+  NamedEntity:
+    extends: "Entity"
+    description: "Entité avec un nom"
+    properties:
+      - name: "nom"
+        type: "string"
+        required: true
+        description: "Nom de l'entité"
+  
+  # Toute entité avec un statut
+  StatusEntity:
+    extends: "NamedEntity"
+    description: "Entité avec un statut"
+    properties:
+      - name: "statut"
+        type: "enum"
+        required: true
+        description: "Statut de l'entité"
+        enum_values: ["actif", "inactif", "maintenance", "hors_service"]
+  
+  # Toute entité géolocalisée
+  GeoEntity:
+    extends: "NamedEntity"
+    description: "Entité avec une localisation"
+    properties:
+      - name: "localisation"
+        type: "string"
+        required: false
+        description: "Localisation de l'entité"
+      - name: "latitude"
+        type: "float"
+        required: false
+        description: "Latitude"
+      - name: "longitude"
+        type: "float"
+        required: false
+        description: "Longitude"
+  
+  # Toute entité temporelle
+  TemporalEntity:
+    extends: "Entity"
+    description: "Entité avec une dimension temporelle"
+    properties:
+      - name: "date"
+        type: "datetime"
+        required: true
+        description: "Date de l'événement"
+      - name: "duree_min"
+        type: "integer"
+        required: false
+        description: "Durée en minutes"
+
+# ============================================================================
+# RELATIONS DE BASE
+# ============================================================================
+
+base_relationships:
+  # Relation d'appartenance
+  APPARTIENT_A:
+    description: "Relation d'appartenance"
+    source: "Entity"
+    target: "Entity"
+    cardinality: "N:1"
+  
+  # Relation de dépendance
+  DEPEND_DE:
+    description: "Relation de dépendance"
+    source: "Entity"
+    target: "Entity"
+    cardinality: "N:M"
+  
+  # Relation de localisation
+  SITUE_A:
+    description: "Relation de localisation"
+    source: "Entity"
+    target: "GeoEntity"
+    cardinality: "N:1"
+  
+  # Relation historique
+  HISTORIQUE:
+    description: "Relation historique"
+    source: "Entity"
+    target: "TemporalEntity"
+    cardinality: "1:N"

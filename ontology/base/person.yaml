@@ -1,0 +1,79 @@
+# ============================================================================
+# ONTOLOGIE - PERSONNE
+# ============================================================================
+# Définition des concepts liés aux personnes
+# ============================================================================
+
+ontology:
+  name: "Person Ontology"
+  version: "1.0.0"
+  description: "Concepts liés aux personnes"
+
+# ============================================================================
+# TYPES DE PERSONNES
+# ============================================================================
+
+person_types:
+  # Représente une personne physique
+  Personne:
+    extends: "NamedEntity"
+    description: "Personne physique"
+    properties:
+      - name: "prenom"
+        type: "string"
+        required: true
+        description: "Prénom de la personne"
+      - name: "nom"
+        type: "string"
+        required: true
+        description: "Nom de la personne"
+      - name: "email"
+        type: "string"
+        required: false
+        description: "Adresse email"
+      - name: "telephone"
+        type: "string"
+        required: false
+        description: "Numéro de téléphone"
+      - name: "fonction"
+        type: "string"
+        required: false
+        description: "Fonction de la personne"
+      - name: "departement"
+        type: "string"
+        required: false
+        description: "Département de la personne"
+  
+  # Représente un contact
+  Contact:
+    extends: "Personne"
+    description: "Contact d'une organisation"
+    properties:
+      - name: "role"
+        type: "enum"
+        required: true
+        description: "Rôle du contact"
+        enum_values: ["commercial", "technique", "administratif", "direction"]
+      - name: "priorite"
+        type: "enum"
+        required: false
+        description: "Priorité du contact"
+        enum_values: ["primaire", "secondaire", "secours"]
+  
+  # Représente un opérateur
+  Operateur:
+    extends: "Personne"
+    description: "Opérateur sur le terrain"
+    properties:
+      - name: "matricule"
+        type: "string"
+        required: true
+        description: "Matricule de l'opérateur"
+      - name: "qualification"
+        type: "string"
+        required: true
+        description: "Qualification de l'opérateur"
+      - name: "zone_intervention"
+        type: "string"
+        required: false
+        description: "Zone d'intervention"

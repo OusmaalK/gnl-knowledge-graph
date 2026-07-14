@@ -1,0 +1,78 @@
+# Configuration des modèles LLM pour le projet GNL
+
+# Modèles de base
+models:
+  # Modèle Llama 3
+  llama3:
+    name: "llama3:70b"
+    type: "ollama"
+    context_length: 8192
+    temperature: 0.7
+    top_p: 0.9
+    top_k: 40
+    repeat_penalty: 1.1
+    
+  # Modèle Mistral
+  mistral:
+    name: "mistral:7b"
+    type: "ollama"
+    context_length: 4096
+    temperature: 0.6
+    top_p: 0.85
+    
+  # Petit modèle pour tâches simples
+  phi3:
+    name: "phi3:mini"
+    type: "ollama"
+    context_length: 4096
+    temperature: 0.5
+    top_p: 0.8
+
+# Embeddings
+embeddings:
+  # Modèle BGE-M3
+  bge_m3:
+    name: "BGE-M3"
+    type: "sentence_transformers"
+    dimension: 1024
+    max_length: 8192
+    
+  # Modèle all-MiniLM (légèr)
+  all_minilm:
+    name: "all-MiniLM-L6-v2"
+    type: "sentence_transformers"
+    dimension: 384
+    max_length: 256
+
+# Configuration d'inférence
+inference:
+  batch:
+    batch_size: 32
+    max_tokens: 2048
+    temperature: 0.3
+    
+  realtime:
+    max_tokens: 1024
+    temperature: 0.1
+    stream: true
+    
+  vllm:
+    model: "llama3:70b"
+    tensor_parallel_size: 1
+    gpu_memory_utilization: 0.8
+    max_num_seqs: 256
+
+# Fine-tuning
+fine_tuning:
+  lora:
+    r: 16
+    alpha: 32
+    dropout: 0.1
+    target_modules: ["q_proj", "v_proj", "k_proj", "o_proj"]
+    
+  training:
+    batch_size: 4
+    num_epochs: 3
+    learning_rate: 2e-4
+    warmup_steps: 100
+    weight_decay: 0.01

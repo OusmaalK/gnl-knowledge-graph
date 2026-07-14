@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: gnl-frontend
+    runtime: image
+    repo: https://github.com/VOTRE_NOM_UTILISATEUR/gnl-knowledge-graph.git
+    plan: free
+    dockerfilePath: ./frontend/Dockerfile
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://gnl-backend.onrender.com

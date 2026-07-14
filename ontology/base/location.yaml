@@ -1,0 +1,91 @@
+# ============================================================================
+# ONTOLOGIE - LOCALISATION
+# ============================================================================
+# Définition des concepts liés à la localisation
+# ============================================================================
+
+ontology:
+  name: "Location Ontology"
+  version: "1.0.0"
+  description: "Concepts liés à la localisation"
+
+# ============================================================================
+# TYPES DE LOCALISATIONS
+# ============================================================================
+
+location_types:
+  # Représente une localisation
+  Lieu:
+    extends: "NamedEntity"
+    description: "Lieu géographique"
+    properties:
+      - name: "nom"
+        type: "string"
+        required: true
+        description: "Nom du lieu"
+      - name: "latitude"
+        type: "float"
+        required: false
+        description: "Latitude"
+      - name: "longitude"
+        type: "float"
+        required: false
+        description: "Longitude"
+      - name: "adresse"
+        type: "string"
+        required: false
+        description: "Adresse postale"
+      - name: "code_postal"
+        type: "string"
+        required: false
+        description: "Code postal"
+      - name: "ville"
+        type: "string"
+        required: false
+        description: "Ville"
+      - name: "pays"
+        type: "string"
+        required: false
+        description: "Pays"
+      - name: "region"
+        type: "string"
+        required: false
+        description: "Région"
+  
+  # Représente un port
+  Port:
+    extends: "Lieu"
+    description: "Port maritime"
+    properties:
+      - name: "type"
+        type: "enum"
+        required: true
+        description: "Type de port"
+        enum_values: ["maritime", "fluvial", "industriel"]
+      - name: "capacite"
+        type: "integer"
+        required: false
+        description: "Capacité du port en tonnes"
+      - name: "profondeur"
+        type: "float"
+        required: false
+        description: "Profondeur du port en mètres"
+  
+  # Représente un site industriel
+  SiteIndustriel:
+    extends: "Lieu"
+    description: "Site industriel"
+    properties:
+      - name: "type"
+        type: "enum"
+        required: true
+        description: "Type de site"
+        enum_values: ["usine", "entrepot", "terminal", "raffinerie"]
+      - name: "superficie"
+        type: "float"
+        required: false
+        description: "Superficie en m²"
+      - name: "nb_employes"
+        type: "integer"
+        required: false
+        description: "Nombre d'employés"

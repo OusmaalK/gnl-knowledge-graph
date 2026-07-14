@@ -1,0 +1,93 @@
+# ============================================================================
+# ENTITÉ : FOURNISSEUR
+# ============================================================================
+# Définition du type de nœud Fournisseur
+# ============================================================================
+
+entity:
+  name: "Fournisseur"
+  description: "Producteur ou fournisseur de GNL"
+  inherits: "Organization"
+  
+  # ---------- Visualisation ----------
+  visualization:
+    color: "#3B82F6"
+    icon: "factory"
+    shape: "roundrectangle"
+    size: 60
+  
+  # ---------- Propriétés ----------
+  properties:
+    - name: "id"
+      type: "string"
+      required: true
+      pattern: "^FOUR-\\d{3,4}$"
+      description: "Identifiant unique du fournisseur"
+      example: "FOUR-001"
+    
+    - name: "nom"
+      type: "string"
+      required: true
+      description: "Nom du fournisseur"
+      example: "TotalEnergies"
+    
+    - name: "pays"
+      type: "string"
+      required: false
+      description: "Pays du fournisseur"
+      example: "France"
+    
+    - name: "ville"
+      type: "string"
+      required: false
+      description: "Ville du siège"
+      example: "Paris"
+    
+    - name: "adresse"
+      type: "string"
+      required: false
+      description: "Adresse du fournisseur"
+      example: "2 place Jean Millier"
+    
+    - name: "contact"
+      type: "string"
+      required: false
+      description: "Nom du contact"
+      example: "Jean Dupont"
+    
+    - name: "email"
+      type: "string"
+      required: false
+      pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+      description: "Email du contact"
+      example: "jean.dupont@totalenergies.com"
+    
+    - name: "statut"
+      type: "enum"
+      required: true
+      enum_values: ["actif", "inactif", "suspendu"]
+      default: "actif"
+      description: "Statut du fournisseur"
+      example: "actif"
+    
+    - name: "created_at"
+      type: "datetime"
+      required: false
+      description: "Date de création"
+    
+    - name: "updated_at"
+      type: "datetime"
+      required: false
+      description: "Date de dernière mise à jour"
+  
+  # ---------- Relations ----------
+  relationships:
+    - type: "FOURNIT"
+      target: "Terminal"
+      cardinality: "N:M"
+      description: "Un fournisseur approvisionne des terminaux"
+    
+    - type: "EXPLOITE_PAR"
+      target: "Terminal"
+      cardinality: "1:N"
+      description: "Un fournisseur exploite des terminaux"

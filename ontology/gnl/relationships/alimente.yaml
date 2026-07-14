@@ -1,0 +1,59 @@
+# ============================================================================
+# RELATION : ALIMENTE
+# ============================================================================
+# Définition de la relation entre un terminal et un pipeline
+# ============================================================================
+
+relationship:
+  name: "ALIMENTE"
+  description: "Un terminal alimente un pipeline"
+  
+  # ---------- Cardinalité ----------
+  source: "Terminal"
+  target: "Pipeline"
+  cardinality: "1:N"
+  
+  # ---------- Visualisation ----------
+  visualization:
+    color: "#10B981"
+    style: "solid"
+    width: 3
+    label: "alimente"
+  
+  # ---------- Propriétés ----------
+  properties:
+    - name: "debit"
+      type: "float"
+      required: true
+      min: 0
+      description: "Débit en m³/s"
+      example: 50
+    
+    - name: "date"
+      type: "datetime"
+      required: false
+      description: "Date de l'alimentation"
+      example: "2026-07-10T12:00:00Z"
+    
+    - name: "statut"
+      type: "enum"
+      required: false
+      enum_values: ["actif", "suspendu"]
+      default: "actif"
+      description: "Statut de l'alimentation"
+  
+  # ---------- Exemples ----------
+  examples:
+    - source: "TERM-001"
+      target: "PIPE-001"
+      properties:
+        debit: 50
+        date: "2026-07-10T12:00:00Z"
+        statut: "actif"
+    
+    - source: "TERM-002"
+      target: "PIPE-002"
+      properties:
+        debit: 45
+        date: "2026-07-10T12:00:00Z"
+        statut: "actif"

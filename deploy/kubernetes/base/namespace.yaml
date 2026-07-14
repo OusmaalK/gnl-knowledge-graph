@@ -1,0 +1,21 @@
+# ============================================================================
+# Namespace GNL Knowledge Graph
+# ============================================================================
+# Définition du namespace pour l'application
+# ============================================================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gnl-knowledge-graph
+  labels:
+    name: gnl-knowledge-graph
+    environment: ${ENVIRONMENT}
+    app: gnl-knowledge-graph
+    managed-by: kubectl
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/enforce-version: latest
+  annotations:
+    description: "GNL Knowledge Graph - Espace de noms pour l'application"
+    owner: "GNL Team"
+    contact: "team@gnl-company.com"

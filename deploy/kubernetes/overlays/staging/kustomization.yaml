@@ -1,0 +1,79 @@
+# ============================================================================
+# Kustomization - Environnement de Staging
+# ============================================================================
+# Description: Configuration pour l'environnement de staging
+# Utilisation: kubectl apply -k deploy/kubernetes/overlays/staging/
+# ============================================================================
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# ---------- Ressources de base ----------
+resources:
+  - ../../base/namespace.yaml
+  - ../../services/neo4j/deployment.yaml
+  - ../../services/neo4j/service.yaml
+  - ../../services/neo4j/persistent-volume.yaml
+  - ../../services/qdrant/deployment.yaml
+  - ../../services/qdrant/service.yaml
+  - ../../services/kafka/deployment.yaml
+  - ../../services/kafka/service.yaml
+  - ../../services/redis/deployment.yaml
+  - ../../services/redis/service.yaml
+  - ../../services/api/deployment.yaml
+  - ../../services/api/service.yaml
+  - ../../services/api/ingress.yaml
+  - ../../services/agents/deployment.yaml
+  - ../../services/agents/service.yaml
+  - ../../services/agents/hpa.yaml
+
+# ---------- Patches ----------
+patchesStrategicMerge:
+  - patches/neo4j-staging-patch.yaml
+  - patches/api-staging-patch.yaml
+  - patches/agents-staging-patch.yaml
+  - patches/resources-staging-patch.yaml
+  - patches/ingress-staging-patch.yaml
+
+# ---------- Images ----------
+images:
+  - name: gnl-api
+    newName: gnl-api
+    newTag: staging-latest
+  - name: gnl-agent
+    newName: gnl-agent
+    newTag: staging-latest
+  - name: gnl-ingestion
+    newName: gnl-ingestion
+    newTag: staging-latest
+  - name: gnl-transform
+    newName: gnl-transform
+    newTag: staging-latest
+
+# ---------- ConfigMap ----------
+configMapGenerator:
+  - name: gnl-config-staging
+    behavior: merge
+    literals:
+      - ENV=staging
+      - LOG_LEVEL=INFO
+      - NEO4J_dbms_memory_heap_initial__size=512m
+      - NEO4J_dbms_memory_heap_max__size=2g
+      - API_REPLICAS=2
+      - AGENT_REPLICAS=2
+      - FEATURE_GRAPH_RAG=true
+      - FEATURE_AUTO_INGESTION=true
+      - FEATURE_MONITORING=true
+
+# ---------- Namespace ----------
+namespace: gnl-knowledge-graph
+
+# ---------- Labels ----------
+commonLabels:
+  environment: staging
+  managed-by: kustomize
+
+# ---------- Annotations ----------
+commonAnnotations:
+  environment: staging
+  description: "GNL Knowledge Graph - Environnement de staging (pré-production)"

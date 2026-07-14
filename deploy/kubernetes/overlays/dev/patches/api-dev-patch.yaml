@@ -1,0 +1,27 @@
+# ============================================================================
+# Patch API - Développement
+# ============================================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gnl-api
+  namespace: gnl-knowledge-graph
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: gnl-api
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        env:
+        - name: DEBUG
+          value: "true"
+        - name: LOG_LEVEL
+          value: "DEBUG"

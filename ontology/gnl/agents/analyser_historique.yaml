@@ -1,0 +1,135 @@
+# ============================================================================
+# AGENT : ANALYSER HISTORIQUE
+# ============================================================================
+# Définition de l'outil d'analyse historique pour les agents IA
+# ============================================================================
+
+tool:
+  name: "analyser_historique"
+  description: "Analyse l'historique des incidents et événements"
+  agent_type: "diagnostic"
+  
+  # ---------- Paramètres ----------
+  parameters:
+    - name: "equipment_id"
+      type: "string"
+      required: false
+      description: "ID de l'équipement à analyser"
+      example: "PIPE-001"
+    
+    - name: "start_date"
+      type: "string"
+      required: false
+      description: "Date de début (format ISO)"
+      example: "2026-01-01T00:00:00Z"
+    
+    - name: "end_date"
+      type: "string"
+      required: false
+      description: "Date de fin (format ISO)"
+      example: "2026-12-31T23:59:59Z"
+    
+    - name: "gravite"
+      type: "string"
+      required: false
+      enum_values: ["critique", "majeur", "mineur"]
+      description: "Filtrer par gravité"
+  
+  # ---------- Requêtes Cypher ----------
+  cypher_queries:
+    # Historique complet
+    full_history: |
+      MATCH (i:Incident)
+      OPTIONAL MATCH (i)-[:AFFECTE]->(e)
+      RETURN 
+        i.id as incident,
+        i.description as description,
+        i.gravite as gravite,
+        i.date as date,
+        i.cause as cause,
+        i.duree_min as duree,
+        e.id as equipment_id,
+        e.nom as equipment_name
+      ORDER BY i.date DESC
+      LIMIT $limit
+    
+    # Historique par équipement
+    equipment_history: |
+      MATCH (i:Incident)-[:AFFECTE]->(e {id: $equipment_id})
+      RETURN 
+        i.id as incident,
+        i.description as description,
+        i.gravite as gravite,
+        i.date as date,
+        i.cause as cause,
+        i.duree_min as duree,
+        e.id as equipment_id,
+        e.nom as equipment_name
+      ORDER BY i.date DESC
+      LIMIT $limit
+    
+    # Historique par période
+    period_history: |
+      MATCH (i:Incident)
+      WHERE datetime(i.date) >= datetime($start_date)
+        AND datetime(i.date) <= datetime($end_date)
+      OPTIONAL MATCH (i)-[:AFFECTE]->(e)
+      RETURN 
+        i.id as incident,
+        i.description as description,
+        i.gravite as gravite,
+        i.date as date,
+        i.cause as cause,
+        i.duree_min as duree,
+        e.id as equipment_id,
+        e.nom as equipment_name
+      ORDER BY i.date DESC
+      LIMIT $limit
+    
+    # Statistiques historiques
+    history_statistics: |
+      MATCH (i:Incident)
+      RETURN 
+        count(i) as total_incidents,
+        count(DISTINCT i.cause) as total_causes,
+        count(DISTINCT i.gravite) as total_gravites,
+        min(i.date) as first_incident,
+        max(i.date) as last_incident
+  
+  # ---------- Réponse ----------
+  response_template: |
+    📊 ANALYSE HISTORIQUE
+    
+    📈 STATISTIQUES :
+    - Total incidents : {total_incidents}
+    - Période : {first_incident} → {last_incident}
+    - Causes distinctes : {total_causes}
+    - Gravités distinctes : {total_gravites}
+    
+    📋 DÉTAILS DES INCIDENTS :
+    {incidents_list}
+    
+    📊 TENDANCES :
+    {trends}
+  
+  # ---------- Exemple ----------
+  example:
+    input:
+      equipment_id: "PIPE-001"
+      limit: 10
+    output: |
+      📊 ANALYSE HISTORIQUE
+      
+      📈 STATISTIQUES :
+      - Total incidents : 3
+      - Période : 2026-07-01 → 2026-07-08
+      - Causes distinctes : 2
+      - Gravités distinctes : 2
+      
+      📋 DÉTAILS DES INCIDENTS :
+      1. INC-001 - Fuite sur le pipeline Nord-Sud (critique)
+      2. INC-002 - Variation de pression (majeur)
+      
+      📊 TENDANCES :
+      - Augmentation des incidents en juillet
+      - Corrosion identifiée comme cause principale

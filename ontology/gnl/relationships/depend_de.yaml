@@ -1,0 +1,53 @@
+# ============================================================================
+# RELATION : DEPEND_DE
+# ============================================================================
+# Définition de la relation entre un pipeline et un compresseur
+# ============================================================================
+
+relationship:
+  name: "DEPEND_DE"
+  description: "Un pipeline dépend d'un compresseur"
+  
+  # ---------- Cardinalité ----------
+  source: "Pipeline"
+  target: "Compresseur"
+  cardinality: "N:M"
+  
+  # ---------- Visualisation ----------
+  visualization:
+    color: "#EC4899"
+    style: "solid"
+    width: 2
+    label: "dépend de"
+  
+  # ---------- Propriétés ----------
+  properties:
+    - name: "type"
+      type: "enum"
+      required: true
+      enum_values: ["pression", "debit", "controle"]
+      default: "pression"
+      description: "Type de dépendance"
+      example: "pression"
+    
+    - name: "niveau"
+      type: "enum"
+      required: false
+      enum_values: ["critique", "important", "secondaire"]
+      default: "important"
+      description: "Niveau de dépendance"
+      example: "critique"
+    
+    - name: "date_debut"
+      type: "datetime"
+      required: false
+      description: "Date de début de la dépendance"
+  
+  # ---------- Exemples ----------
+  examples:
+    - source: "PIPE-001"
+      target: "COMP-001"
+      properties:
+        type: "pression"
+        niveau: "critique"
+        date_debut: "2020-01-01T00:00:00Z"

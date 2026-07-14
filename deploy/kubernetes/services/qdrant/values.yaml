@@ -1,0 +1,50 @@
+# ============================================================================
+# Values pour Qdrant
+# ============================================================================
+
+qdrant:
+  image:
+    repository: qdrant/qdrant
+    tag: v1.7.0
+    pullPolicy: IfNotPresent
+  
+  replicas: 1
+  
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+    limits:
+      memory: 2Gi
+      cpu: 1
+  
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: standard
+  
+  config:
+    service:
+      api_key: ""
+      grpc_port: 6334
+      http_port: 6333
+    
+    storage:
+      storage_path: /qdrant/storage
+      performance:
+        max_search_threads: 4
+  
+  service:
+    type: ClusterIP
+    ports:
+      http: 6333
+      grpc: 6334
+  
+  ingress:
+    enabled: false
+  
+  monitoring:
+    enabled: true
+    prometheus:
+      port: 6333
+      path: /metrics

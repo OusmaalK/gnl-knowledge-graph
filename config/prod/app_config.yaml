@@ -1,0 +1,114 @@
+# ============================================================================
+# Application Configuration - Production
+# ============================================================================
+# Environnement: prod
+# Description: Configuration pour l'environnement de production
+# ============================================================================
+
+app:
+  name: "GNL Knowledge Graph"
+  version: "1.0.0"
+  environment: "prod"
+  debug: false
+
+# Serveur
+server:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  reload: false
+  log_level: "warning"
+
+# API
+api:
+  title: "GNL Knowledge Graph API"
+  description: "API pour le réseau de connaissances GNL"
+  version: "1.0.0"
+  docs_url: "/docs"
+  redoc_url: "/redoc"
+  openapi_url: "/openapi.json"
+  cors_origins: 
+    - "https://gnl-knowledge-graph.com"
+    - "https://api.gnl-knowledge-graph.com"
+  token_expire_minutes: 15
+
+# Bases de données
+databases:
+  neo4j:
+    uri: "bolt://neo4j-service:7687"
+    user: "neo4j"
+    max_connection_pool: 50
+    connection_timeout: 10
+  
+  qdrant:
+    host: "qdrant-service"
+    port: 6333
+    grpc_port: 6334
+    api_key: "${QDRANT_API_KEY}"
+  
+  redis:
+    host: "redis-service"
+    port: 6379
+    password: "${REDIS_PASSWORD}"
+    db: 0
+    ttl: 3600
+
+# Message Queue
+message_queue:
+  kafka:
+    bootstrap_servers: "kafka-service:9092"
+    group_id: "gnl-prod-group"
+    auto_offset_reset: "earliest"
+    enable_auto_commit: true
+    auto_commit_interval_ms: 10000
+    max_poll_records: 1000
+
+# LLM
+llm:
+  model: "llama3:70b"
+  api_url: "http://ollama:11434"
+  embedding_model: "BGE-M3"
+  temperature: 0.3
+  max_tokens: 4096
+  top_p: 0.85
+  top_k: 30
+
+# Storage
+storage:
+  s3:
+    endpoint: "minio-service:9000"
+    access_key: "${S3_ACCESS_KEY}"
+    secret_key: "${S3_SECRET_KEY}"
+    secure: true
+    buckets:
+      raw: "gnl-raw"
+      processed: "gnl-processed"
+      embeddings: "gnl-embeddings"
+
+# Features
+features:
+  graph_rag: true
+  agents: true
+  auto_ingestion: true
+  monitoring: true
+  alerts: true
+  backup: true
+
+# Monitoring
+monitoring:
+  metrics: true
+  traces: true
+  logs: true
+  profiler: false
+
+# Cache
+cache:
+  enabled: true
+  default_ttl: 600
+  max_size: 10000
+
+# Rate Limiting
+rate_limit:
+  enabled: true
+  default_limit: 1000
+  default_period: 60

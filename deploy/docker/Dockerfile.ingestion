@@ -1,0 +1,29 @@
+# Dockerfile pour l'Ingestion de données
+# Utilisation: docker build -f deploy/docker/Dockerfile.ingestion -t gnl-ingestion .
+
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+COPY requirements.txt .
+COPY requirements-prod.txt .
+
+RUN apt-get update && apt-get install -y gcc && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir -r requirements-prod.txt
+
+COPY src/ingestion/ ./src/ingestion/
+COPY data/ ./data/
+COPY config/ ./config/
+COPY .env .env
+
+RUN addgroup --system --gid 1001 appgroup && \
+    adduser --system --uid 1001 --gid 1001 appuser
+
+USER appuser
+
+CMD ["python", "-m", "src.ingestion.scheduler"]

@@ -1,0 +1,38 @@
+# Values pour le chart Neo4j
+neo4j:
+  image:
+    repository: neo4j
+    tag: 5.14.0-enterprise
+    pullPolicy: IfNotPresent
+  
+  replicas: 1
+  
+  resources:
+    requests:
+      memory: 2Gi
+      cpu: 1
+    limits:
+      memory: 4Gi
+      cpu: 2
+  
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: standard
+  
+  config:
+    dbms.memory.heap.initial_size: 512m
+    dbms.memory.heap.max_size: 4g
+    dbms.memory.pagecache.size: 2g
+    dbms.security.auth_enabled: true
+  
+  plugins:
+    - apoc
+    - bloom
+    - graph-data-science
+  
+  service:
+    type: ClusterIP
+    ports:
+      http: 7474
+      bolt: 7687

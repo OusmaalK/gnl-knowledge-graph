@@ -1,0 +1,29 @@
+# Dockerfile pour la Transformation de données
+# Utilisation: docker build -f deploy/docker/Dockerfile.transform -t gnl-transform .
+
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+COPY requirements.txt .
+COPY requirements-prod.txt .
+
+RUN apt-get update && apt-get install -y gcc && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir -r requirements-prod.txt
+
+COPY src/transform/ ./src/transform/
+COPY src/graph/ ./src/graph/
+COPY config/ ./config/
+COPY .env .env
+
+RUN addgroup --system --gid 1001 appgroup && \
+    adduser --system --uid 1001 --gid 1001 appuser
+
+USER appuser
+
+CMD ["python", "-m", "src.transform.pipeline"]

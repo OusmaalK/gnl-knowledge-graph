@@ -1,0 +1,86 @@
+# ============================================================================
+# Kustomization - Environnement de Production
+# ============================================================================
+# Description: Configuration pour l'environnement de production
+# Utilisation: kubectl apply -k deploy/kubernetes/overlays/prod/
+# ============================================================================
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# ---------- Ressources de base ----------
+resources:
+  - ../../base/namespace.yaml
+  - ../../services/neo4j/deployment.yaml
+  - ../../services/neo4j/service.yaml
+  - ../../services/neo4j/persistent-volume.yaml
+  - ../../services/qdrant/deployment.yaml
+  - ../../services/qdrant/service.yaml
+  - ../../services/kafka/deployment.yaml
+  - ../../services/kafka/service.yaml
+  - ../../services/redis/deployment.yaml
+  - ../../services/redis/service.yaml
+  - ../../services/api/deployment.yaml
+  - ../../services/api/service.yaml
+  - ../../services/api/ingress.yaml
+  - ../../services/agents/deployment.yaml
+  - ../../services/agents/service.yaml
+  - ../../services/agents/hpa.yaml
+  - ../../monitoring/prometheus.yaml
+  - ../../monitoring/grafana.yaml
+
+# ---------- Patches ----------
+patchesStrategicMerge:
+  - patches/neo4j-prod-patch.yaml
+  - patches/api-prod-patch.yaml
+  - patches/agents-prod-patch.yaml
+  - patches/resources-prod-patch.yaml
+  - patches/ingress-prod-patch.yaml
+  - patches/monitoring-prod-patch.yaml
+
+# ---------- Images ----------
+images:
+  - name: gnl-api
+    newName: gnl-api
+    newTag: prod-latest
+  - name: gnl-agent
+    newName: gnl-agent
+    newTag: prod-latest
+  - name: gnl-ingestion
+    newName: gnl-ingestion
+    newTag: prod-latest
+  - name: gnl-transform
+    newName: gnl-transform
+    newTag: prod-latest
+
+# ---------- ConfigMap ----------
+configMapGenerator:
+  - name: gnl-config-prod
+    behavior: merge
+    literals:
+      - ENV=prod
+      - LOG_LEVEL=WARNING
+      - NEO4J_dbms_memory_heap_initial__size=2g
+      - NEO4J_dbms_memory_heap_max__size=8g
+      - API_REPLICAS=3
+      - AGENT_REPLICAS=3
+      - FEATURE_GRAPH_RAG=true
+      - FEATURE_AUTO_INGESTION=true
+      - FEATURE_MONITORING=true
+      - FEATURE_ALERTS=true
+      - FEATURE_BACKUP=true
+
+# ---------- Namespace ----------
+namespace: gnl-knowledge-graph
+
+# ---------- Labels ----------
+commonLabels:
+  environment: prod
+  managed-by: kustomize
+
+# ---------- Annotations ----------
+commonAnnotations:
+  environment: prod
+  description: "GNL Knowledge Graph - Environnement de production"
+  reliability: "high"
+  sla: "99.9%"

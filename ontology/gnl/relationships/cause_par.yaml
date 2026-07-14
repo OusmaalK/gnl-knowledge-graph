@@ -1,0 +1,51 @@
+# ============================================================================
+# RELATION : CAUSE_PAR
+# ============================================================================
+# Définition de la relation entre un incident et sa cause
+# ============================================================================
+
+relationship:
+  name: "CAUSE_PAR"
+  description: "Un incident est causé par un facteur"
+  
+  # ---------- Cardinalité ----------
+  source: "Incident"
+  target: "Cause"
+  cardinality: "N:1"
+  
+  # ---------- Visualisation ----------
+  visualization:
+    color: "#DC2626"
+    style: "dashed"
+    width: 2
+    label: "causé par"
+  
+  # ---------- Propriétés ----------
+  properties:
+    - name: "type"
+      type: "enum"
+      required: true
+      enum_values: ["mecanique", "corrosion", "humaine", "environnementale", "autre"]
+      default: "autre"
+      description: "Type de cause"
+      example: "corrosion"
+    
+    - name: "description"
+      type: "string"
+      required: false
+      description: "Description détaillée de la cause"
+      example: "Corrosion du pipeline due à l'humidité"
+    
+    - name: "date_detection"
+      type: "datetime"
+      required: false
+      description: "Date de détection de la cause"
+  
+  # ---------- Exemples ----------
+  examples:
+    - source: "INC-001"
+      target: "CAUSE-001"
+      properties:
+        type: "corrosion"
+        description: "Corrosion du pipeline due à l'humidité"
+        date_detection: "2026-07-08T10:30:00Z"

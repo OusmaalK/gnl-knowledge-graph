@@ -1,0 +1,49 @@
+{
+  "network_summary": {
+    "total_nodes": 15,
+    "total_relations": 12
+  },
+  "equipment_context": {
+    "id": "PIPE-001",
+    "type": "Pipeline",
+    "nom": "Nord-Sud",
+    "statut": "actif",
+    "clients": [
+      "EDF"
+    ],
+    "incidents": [
+      "Fuite sur le pipeline Nord-Sud"
+    ],
+    "nombre_incidents": 1
+  },
+  "supply_chain": [
+    {
+      "Fournisseur": "TotalEnergies",
+      "Terminal": "Fos-sur-Mer",
+      "Pipeline": "Nord-Sud",
+      "Client": "EDF",
+      "StatutPipeline": "actif"
+    },
+    {
+      "Fournisseur": "TotalEnergies",
+      "Terminal": "Fos-sur-Mer",
+      "Pipeline": "Nord-Sud",
+      "Client": "EDF",
+      "StatutPipeline": "actif"
+    },
+    {
+      "Fournisseur": "TotalEnergies",
+      "Terminal": "Fos-sur-Mer",
+      "Pipeline": "Nord-Sud",
+      "Client": "EDF",
+      "StatutPipeline": "actif"
+    },
+    {
+      "Fournisseur": "TotalEnergies",
+      "Terminal": "Fos-sur-Mer",
+      "Pipeline": "Nord-Sud",
+      "Client": "EDF",
+      "StatutPipeline": "actif"
+    }
+  ]
+}

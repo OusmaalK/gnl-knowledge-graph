@@ -1,0 +1,35 @@
+# ============================================================================
+# Service GNL Graph
+# ============================================================================
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "gnl-graph.fullname" . }}-api
+  namespace: {{ .Values.global.namespace | default "gnl-knowledge-graph" }}
+  labels:
+    {{- include "gnl-graph.labels" . | nindent 4 }}
+    component: api
+  annotations:
+    {{- with .Values.api.service.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.api.service.type | default "ClusterIP" }}
+  selector:
+    {{- include "gnl-graph.selectorLabels" . | nindent 4 }}
+    component: api
+  ports:
+  - name: http
+    port: {{ .Values.api.service.port | default 8000 }}
+    targetPort: http
+    protocol: TCP
+    {{- if and (eq .Values.api.service.type "NodePort") .Values.api.service.nodePort }}
+    nodePort: {{ .Values.api.service.nodePort }}
+    {{- end }}
+  sessionAffinity: {{ .Values.api.service.sessionAffinity | default "None" }}
+  {{- if eq .Values.api.service.sessionAffinity "ClientIP" }}
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: {{ .Values.api.service.sessionAffinityTimeout | default 10800 }}
+  {{- end }}

@@ -1,0 +1,95 @@
+# ============================================================================
+# ENTITÉ : INCIDENT
+# ============================================================================
+# Définition du type de nœud Incident
+# ============================================================================
+
+entity:
+  name: "Incident"
+  description: "Événement anormal sur le réseau GNL"
+  inherits: "Evenement"
+  
+  # ---------- Visualisation ----------
+  visualization:
+    color: "#DC2626"
+    icon: "alert-triangle"
+    shape: "diamond"
+    size: 50
+  
+  # ---------- Propriétés ----------
+  properties:
+    - name: "id"
+      type: "string"
+      required: true
+      pattern: "^INC-\\d{3,4}$"
+      description: "Identifiant unique de l'incident"
+      example: "INC-001"
+    
+    - name: "description"
+      type: "string"
+      required: true
+      description: "Description de l'incident"
+      example: "Fuite sur le pipeline Nord-Sud"
+    
+    - name: "gravite"
+      type: "enum"
+      required: true
+      enum_values: ["critique", "majeur", "mineur"]
+      default: "mineur"
+      description: "Gravité de l'incident"
+      example: "critique"
+    
+    - name: "date"
+      type: "datetime"
+      required: true
+      description: "Date de l'incident"
+      example: "2026-07-08T10:30:00Z"
+    
+    - name: "cause"
+      type: "string"
+      required: false
+      description: "Cause de l'incident"
+      example: "corrosion"
+    
+    - name: "action"
+      type: "string"
+      required: false
+      description: "Action entreprise"
+      example: "Réparation d'urgence"
+    
+    - name: "duree_min"
+      type: "integer"
+      required: false
+      min: 0
+      description: "Durée en minutes"
+      example: 240
+    
+    - name: "statut"
+      type: "enum"
+      required: false
+      enum_values: ["ouvert", "en_cours", "resolu", "ferme"]
+      default: "ouvert"
+      description: "Statut de l'incident"
+      example: "resolu"
+    
+    - name: "created_at"
+      type: "datetime"
+      required: false
+      description: "Date de création"
+    
+    - name: "updated_at"
+      type: "datetime"
+      required: false
+      description: "Date de dernière mise à jour"
+  
+  # ---------- Relations ----------
+  relationships:
+    - type: "AFFECTE"
+      target: "Entity"
+      cardinality: "N:M"
+      description: "Un incident affecte des équipements"
+    
+    - type: "CAUSE"
+      target: "Cause"
+      cardinality: "N:1"
+      description: "Un incident a une cause"

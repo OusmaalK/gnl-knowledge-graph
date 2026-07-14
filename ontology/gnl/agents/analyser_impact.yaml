@@ -1,0 +1,92 @@
+# ============================================================================
+# AGENT : ANALYSER IMPACT
+# ============================================================================
+# Définition de l'outil d'analyse d'impact pour les agents IA
+# ============================================================================
+
+tool:
+  name: "analyser_impact"
+  description: "Analyse l'impact d'un incident ou d'une panne"
+  agent_type: "diagnostic"
+  
+  # ---------- Paramètres ----------
+  parameters:
+    - name: "incident_id"
+      type: "string"
+      required: false
+      description: "ID de l'incident à analyser"
+      example: "INC-001"
+    
+    - name: "equipment_id"
+      type: "string"
+      required: false
+      description: "ID de l'équipement à analyser"
+      example: "PIPE-001"
+  
+  # ---------- Requêtes Cypher ----------
+  cypher_queries:
+    # Impact d'un incident
+    incident_impact: |
+      MATCH (i:Incident {id: $incident_id})-[:AFFECTE]->(e)
+      OPTIONAL MATCH (e)-[:DESSERT]->(c:Client)
+      RETURN 
+        i.id as incident,
+        i.description as description,
+        e.id as equipment,
+        labels(e)[0] as equipment_type,
+        collect(DISTINCT c.nom) as clients_impactes
+      LIMIT 10
+    
+    # Impact d'un équipement
+    equipment_impact: |
+      MATCH (e {id: $equipment_id})
+      OPTIONAL MATCH (e)-[:DESSERT]->(c:Client)
+      OPTIONAL MATCH (i:Incident)-[:AFFECTE]->(e)
+      RETURN 
+        e.id as equipment,
+        labels(e)[0] as equipment_type,
+        e.nom as equipment_name,
+        e.statut as statut,
+        collect(DISTINCT c.nom) as clients_impactes,
+        collect(DISTINCT i.id) as incidents
+      LIMIT 10
+  
+  # ---------- Réponse ----------
+  response_template: |
+    📊 ANALYSE D'IMPACT
+    
+    🔍 ÉQUIPEMENT : {equipment_name} ({equipment_id})
+    📋 TYPE : {equipment_type}
+    📌 STATUT : {statut}
+    
+    👥 CLIENTS IMPACTÉS :
+    {clients_impactes}
+    
+    📋 INCIDENTS ASSOCIÉS :
+    {incidents}
+    
+    💡 RECOMMANDATIONS :
+    {recommendations}
+  
+  # ---------- Exemple ----------
+  example:
+    input:
+      equipment_id: "PIPE-001"
+    output: |
+      📊 ANALYSE D'IMPACT
+      
+      🔍 ÉQUIPEMENT : Nord-Sud (PIPE-001)
+      📋 TYPE : Pipeline
+      📌 STATUT : actif
+      
+      👥 CLIENTS IMPACTÉS :
+      - EDF
+      - Engie
+      
+      📋 INCIDENTS ASSOCIÉS :
+      - INC-001 : Fuite sur le pipeline Nord-Sud
+      
+      💡 RECOMMANDATIONS :
+      1. Inspecter la section affectée
+      2. Planifier une maintenance préventive
+      3. Notifier les clients impactés

@@ -1,0 +1,65 @@
+# ============================================================================
+# Qdrant Configuration - Développement
+# ============================================================================
+# Description: Configuration de Qdrant pour l'environnement de développement
+# ============================================================================
+
+qdrant:
+  # Connexion
+  host: "localhost"
+  port: 6333
+  grpc_port: 6334
+  api_key: ""
+  
+  # Collections
+  collections:
+    gnl_incidents_embeddings:
+      vector_size: 768
+      distance: "Cosine"
+      on_disk_payload: false
+      optimizers:
+        default_segment_number: 2
+        max_segment_size: 20000
+        memmap_threshold: 10000
+        indexing_threshold: 20000
+      hnsw_config:
+        m: 16
+        ef_construct: 100
+        full_scan_threshold: 10000
+      wal_config:
+        wal_capacity_mb: 32
+        wal_segments_ahead: 0
+    
+    gnl_maintenance_embeddings:
+      vector_size: 768
+      distance: "Cosine"
+      on_disk_payload: false
+      optimizers:
+        default_segment_number: 2
+        max_segment_size: 20000
+      hnsw_config:
+        m: 16
+        ef_construct: 100
+    
+    gnl_logistics_embeddings:
+      vector_size: 768
+      distance: "Cosine"
+      on_disk_payload: false
+    
+    gnl_knowledge:
+      vector_size: 768
+      distance: "Cosine"
+      on_disk_payload: false
+  
+  # Recherche
+  search:
+    default_limit: 10
+    max_limit: 100
+    with_payload: true
+    with_vector: false
+  
+  # Performance
+  performance:
+    max_threads: 4
+    batch_size: 100
+    timeout: 30

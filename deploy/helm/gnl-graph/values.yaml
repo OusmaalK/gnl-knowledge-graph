@@ -1,0 +1,123 @@
+# Values par défaut pour GNL Knowledge Graph
+
+# Configuration globale
+global:
+  environment: dev
+  namespace: gnl-knowledge-graph
+  imagePullPolicy: IfNotPresent
+
+# Services
+neo4j:
+  enabled: true
+  image:
+    repository: neo4j
+    tag: 5.14.0-enterprise
+  resources:
+    requests:
+      memory: 2Gi
+      cpu: 1
+    limits:
+      memory: 4Gi
+      cpu: 2
+
+qdrant:
+  enabled: true
+  image:
+    repository: qdrant/qdrant
+    tag: v1.7.0
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+    limits:
+      memory: 2Gi
+      cpu: 1
+
+kafka:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+    limits:
+      memory: 2Gi
+      cpu: 1
+
+redis:
+  enabled: true
+  image:
+    repository: redis
+    tag: 7.2-alpine
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 250m
+    limits:
+      memory: 512Mi
+      cpu: 500m
+
+api:
+  enabled: true
+  replicas: 2
+  image:
+    repository: gnl-api
+    tag: latest
+  service:
+    type: ClusterIP
+    port: 8000
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 250m
+    limits:
+      memory: 512Mi
+      cpu: 500m
+
+agents:
+  enabled: true
+  replicas: 1
+  image:
+    repository: gnl-agent
+    tag: latest
+  service:
+    type: ClusterIP
+    port: 8001
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 500m
+    limits:
+      memory: 1Gi
+      cpu: 1
+
+# Ingress
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: api.gnl-knowledge-graph.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - api.gnl-knowledge-graph.com
+      secretName: gnl-api-tls
+
+# Monitoring
+monitoring:
+  enabled: true
+  prometheus:
+    enabled: true
+  grafana:
+    enabled: true
+
+# Storage
+storage:
+  neo4j:
+    size: 20Gi
+    storageClass: standard
+  qdrant:
+    size: 10Gi
+    storageClass: standard

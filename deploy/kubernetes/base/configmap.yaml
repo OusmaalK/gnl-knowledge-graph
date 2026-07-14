@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gnl-config
+  namespace: gnl-knowledge-graph
+data:
+  ENV: ${ENVIRONMENT}
+  LOG_LEVEL: ${LOG_LEVEL}
+  
+  # Neo4j
+  NEO4J_URI: bolt://neo4j-service:7687
+  NEO4J_USER: neo4j
+  
+  # Qdrant
+  QDRANT_HOST: qdrant-service
+  QDRANT_PORT: "6333"
+  
+  # Kafka
+  KAFKA_BOOTSTRAP_SERVERS: kafka-service:9092
+  KAFKA_GROUP_ID: gnl-group
+  KAFKA_AUTO_OFFSET_RESET: earliest
+  
+  # Redis
+  REDIS_HOST: redis-service
+  REDIS_PORT: "6379"
+  
+  # API
+  API_HOST: 0.0.0.0
+  API_PORT: "8000"
+  
+  # Observability
+  PROMETHEUS_PORT: "9090"
+  GRAFANA_PORT: "3000"
+  
+  # Storage
+  S3_ENDPOINT: minio-service:9000
+  S3_BUCKET_RAW: gnl-raw
+  S3_BUCKET_PROCESSED: gnl-processed

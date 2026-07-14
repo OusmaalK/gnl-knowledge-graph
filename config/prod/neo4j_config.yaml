@@ -1,0 +1,100 @@
+# ============================================================================
+# Neo4j Configuration - Production
+# ============================================================================
+# Description: Configuration de Neo4j pour l'environnement de production
+# ============================================================================
+
+neo4j:
+  # Connexion
+  uri: "bolt://neo4j-service:7687"
+  user: "neo4j"
+  password: "${NEO4J_PASSWORD}"
+  
+  # Pool de connexions
+  connection_pool:
+    max_size: 50
+    acquisition_timeout: 10
+    idle_timeout: 30
+    max_lifetime: 3600
+  
+  # Performance
+  performance:
+    fetch_size: 5000
+    max_transaction_retry_time: 60
+    retry_delay: 2
+  
+  # Memory
+  memory:
+    heap_initial_size: "2g"
+    heap_max_size: "8g"
+    pagecache_size: "4g"
+  
+  # Plugins
+  plugins:
+    - "apoc"
+    - "bloom"
+    - "graph-data-science"
+  
+  # Indexes
+  indexes:
+    - label: "Fournisseur"
+      properties: ["id"]
+    - label: "Terminal"
+      properties: ["id"]
+    - label: "Pipeline"
+      properties: ["id"]
+    - label: "Incident"
+      properties: ["id"]
+    - label: "Client"
+      properties: ["id"]
+    - label: "Compresseur"
+      properties: ["id"]
+    - label: "Stockage"
+      properties: ["id"]
+    - label: "Méthanier"
+      properties: ["id"]
+    - label: "Commande"
+      properties: ["id"]
+    - label: "Equipement"
+      properties: ["statut"]
+    - label: "Incident"
+      properties: ["gravite", "date"]
+    - label: "Pipeline"
+      properties: ["statut", "pression_max_bar"]
+  
+  # Constraints
+  constraints:
+    - label: "Fournisseur"
+      property: "id"
+      type: "unique"
+    - label: "Terminal"
+      property: "id"
+      type: "unique"
+    - label: "Pipeline"
+      property: "id"
+      type: "unique"
+    - label: "Incident"
+      property: "id"
+      type: "unique"
+    - label: "Client"
+      property: "id"
+      type: "unique"
+    - label: "Compresseur"
+      property: "id"
+      type: "unique"
+    - label: "Stockage"
+      property: "id"
+      type: "unique"
+    - label: "Méthanier"
+      property: "id"
+      type: "unique"
+    - label: "Commande"
+      property: "id"
+      type: "unique"
+  
+  # Backup
+  backup:
+    enabled: true
+    schedule: "0 2 * * *"
+    retention_days: 30
+    storage: "s3://gnl-backups/neo4j/"

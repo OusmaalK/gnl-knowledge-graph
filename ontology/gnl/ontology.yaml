@@ -1,0 +1,470 @@
+# ============================================================================
+# ONTOLOGIE GNL - RÉSEAU DE TRANSPORT
+# ============================================================================
+# Version: 1.0.0
+# Dernière mise à jour: 2026-07-10
+# ============================================================================
+
+ontology:
+  name: "GNL Knowledge Graph Ontology"
+  version: "1.0.0"
+  description: "Ontologie du réseau de transport de Gaz Naturel Liquéfié"
+  domain: "energy"
+  industry: "oil_and_gas"
+
+# ============================================================================
+# ENTITÉS (NŒUDS)
+# ============================================================================
+
+entities:
+  # ---- Fournisseur ----
+  Fournisseur:
+    extends: "Organization"
+    description: "Producteur ou fournisseur de GNL"
+    color: "#3B82F6"
+    icon: "factory"
+    properties:
+      - name: "id"
+        type: "string"
+        required: true
+        pattern: "^FOUR-\\d{3,4}$"
+        description: "Identifiant unique du fournisseur"
+      - name: "nom"
+        type: "string"
+        required: true
+        description: "Nom du fournisseur"
+      - name: "pays"
+        type: "string"
+        required: false
+        description: "Pays du fournisseur"
+      - name: "ville"
+        type: "string"
+        required: false
+        description: "Ville du siège"
+      - name: "adresse"
+        type: "string"
+        required: false
+        description: "Adresse du fournisseur"
+      - name: "contact"
+        type: "string"
+        required: false
+        description: "Nom du contact"
+      - name: "email"
+        type: "string"
+        required: false
+        pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+        description: "Email du contact"
+      - name: "statut"
+        type: "enum"
+        required: true
+        enum_values: ["actif", "inactif", "suspendu"]
+        default: "actif"
+        description: "Statut du fournisseur"
+
+  # ---- Terminal ----
+  Terminal:
+    extends: "SiteIndustriel"
+    description: "Terminal de réception et distribution de GNL"
+    color: "#10B981"
+    icon: "terminal"
+    properties:
+      - name: "id"
+        type: "string"
+        required: true
+        pattern: "^TERM-\\d{3,4}$"
+        description: "Identifiant unique du terminal"
+      - name: "nom"
+        type: "string"
+        required: true
+        description: "Nom du terminal"
+      - name: "localisation"
+        type: "string"
+        required: false
+        description: "Localisation du terminal"
+      - name: "capacite_m3"
+        type: "integer"
+        required: true
+        min: 0
+        description: "Capacité en mètres cubes"
+      - name: "type"
+        type: "enum"
+        required: true
+        enum_values: ["LNG", "CNG", "LPG"]
+        default: "LNG"
+        description: "Type de terminal"
+      - name: "statut"
+        type: "enum"
+        required: true
+        enum_values: ["actif", "en_construction", "maintenance", "hors_service"]
+        default: "actif"
+        description: "Statut du terminal"
+
+  # ---- Méthanier ----
+  Méthanier:
+    extends: "NamedEntity"
+    description: "Navire de transport de GNL"
+    color: "#8B5CF6"
+    icon: "ship"
+    properties:
+      - name: "id"
+        type: "string"
+        required: true
+        pattern: "^METH-\\d{3,4}$"
+        description: "Identifiant unique du méthanier"
+      - name: "nom"
+        type: "string"
+        required: true
+        description: "Nom du méthanier"
+      - name: "type"
+        type: "enum"
+        required: true
+        enum_values: ["Méthanier", "GNL", "LNG"]
+        default: "Méthanier"
+        description: "Type de navire"
+      - name: "capacite_m3"
+        type: "integer"
+        required: true
+        min: 0
+        description: "Capacité en mètres cubes"
+      - name: "statut"
+        type: "enum"
+        required: true
+        enum_values: ["en_croisiere", "a_quai", "en_chargement", "en_dechargement"]
+        default: "en_croisiere"
+        description: "Statut du méthanier"
+      - name: "port_actuel"
+        type: "string"
+        required: false
+        description: "Port actuel du méthanier"
+      - name: "latitude"
+        type: "float"
+        required: false
+        min: -90
+        max: 90
+        description: "Latitude du méthanier"
+      - name: "longitude"
+        type: "float"
+        required: false
+        min: -180
+        max: 180
+        description: "Longitude du méthanier"
+      - name: "vitesse_noeuds"
+        type: "float"
+        required: false
+        min: 0
+        description: "Vitesse en nœuds"
+
+  # ---- Pipeline ----
+  Pipeline:
+    extends: "StatusEntity"
+    description: "Pipeline de transport de GNL"
+    color: "#F59E0B"
+    icon: "pipe"
+    properties:
+      - name: "id"
+        type: "string"
+        required: true
+        pattern: "^PIPE-\\d{3,4}$"
+        description: "Identifiant unique du pipeline"
+      - name: "nom"
+        type: "string"
+        required: true
+        description: "Nom du pipeline"
+      - name: "longueur_km"
+        type: "integer"
+        required: true
+        min: 0
+        description: "Longueur en kilomètres"
+      - name: "depart"
+        type: "string"
+        required: false
+        description: "ID du terminal de départ"
+      - name: "arrivee"
+        type: "string"
+        required: false
+        description: "ID du terminal d'arrivée"
+      - name: "pression_max_bar"
+        type: "integer"
+        required: true
+        min: 0
+        description: "Pression maximale en bars"
+      - name: "statut"
+        type: "enum"
+        required: true
+        enum_values: ["actif", "en_test", "maintenance", "hors_service"]
+        default: "actif"
+        description: "Statut du pipeline"
+
+  # ---- Client ----
+  Client:
+    extends: "Organization"
+    description: "Client final de GNL"
+    color: "#EF4444"
+    icon: "user"
+    properties:
+      - name: "id"
+        type: "string"
+        required: true
+        pattern: "^CLIENT-\\d{3,4}$"
+        description: "Identifiant unique du client"
+      - name: "nom"
+        type: "string"
+        required: true
+        description: "Nom du client"
+      - name: "contrat"
+        type: "string"
+        required: false
+        description: "Référence du contrat"
+      - name: "volume_contractuel"
+        type: "integer"
+        required: false
+        min: 0
+        description: "Volume contractuel en m³"
+      - name: "secteur"
+        type: "string"
+        required: false
+        description: "Secteur d'activité du client"
+      - name: "statut"
+        type: "enum"
+        required: true
+        enum_values: ["actif", "inactif", "suspendu"]
+        default: "actif"
+        description: "Statut du client"
+
+  # ---- Stockage ----
+  Stockage:
+    extends: "GeoEntity"
+    description: "Installation de stockage de GNL"
+    color: "#6366F1"
+    icon: "storage"
+    properties:
+      - name: "id"
+        type: "string"
+        required: true
+        pattern: "^STOCK-\\d{3,4}$"
+        description: "Identifiant unique du stockage"
+      - name: "nom"
+        type: "string"
+        required: true
+        description: "Nom du stockage"
+      - name: "capacite"
+        type: "integer"
+        required: true
+        min: 0
+        description: "Capacité totale en m³"
+      - name: "capacite_utilisee"
+        type: "integer"
+        required: false
+        min: 0
+        description: "Capacité utilisée en m³"
+      - name: "type"
+        type: "enum"
+        required: true
+        enum_values: ["souterrain", "aérien", "flottant"]
+        default: "aérien"
+        description: "Type de stockage"
+
+  # ---- Compresseur ----
+  Compresseur:
+    extends: "NamedEntity"
+    description: "Compresseur de gaz"
+    color: "#EC4899"
+    icon: "compressor"
+    properties:
+      - name: "id"
+        type: "string"
+        required: true
+        pattern: "^COMP-\\d{3,4}$"
+        description: "Identifiant unique du compresseur"
+      - name: "nom"
+        type: "string"
+        required: true
+        description: "Nom du compresseur"
+      - name: "puissance"
+        type: "integer"
+        required: true
+        min: 0
+        description: "Puissance en kW"
+      - name: "statut"
+        type: "enum"
+        required: true
+        enum_values: ["actif", "maintenance", "hors_service"]
+        default: "actif"
+        description: "Statut du compresseur"
+
+  # ---- Commande ----
+  Commande:
+    extends: "TemporalEntity"
+    description: "Commande de GNL"
+    color: "#F472B6"
+    icon: "order"
+    properties:
+      - name: "id"
+        type: "string"
+        required: true
+        pattern: "^CMD-\\d{3,4}$"
+        description: "Identifiant unique de la commande"
+      - name: "montant"
+        type: "float"
+        required: true
+        min: 0
+        description: "Montant de la commande"
+      - name: "devise"
+        type: "enum"
+        required: true
+        enum_values: ["EUR", "USD", "GBP"]
+        default: "EUR"
+        description: "Devise de la commande"
+      - name: "statut"
+        type: "enum"
+        required: true
+        enum_values: ["en_cours", "validee", "annulee", "livree"]
+        default: "en_cours"
+        description: "Statut de la commande"
+      - name: "date"
+        type: "datetime"
+        required: true
+        description: "Date de la commande"
+
+# ============================================================================
+# RELATIONS
+# ============================================================================
+
+relationships:
+  # ---- Fournisseur → Terminal ----
+  FOURNIT:
+    description: "Un fournisseur fournit un terminal"
+    source: "Fournisseur"
+    target: "Terminal"
+    cardinality: "N:M"
+    properties:
+      - name: "quantite"
+        type: "integer"
+        required: false
+        min: 0
+        description: "Quantité fournie"
+      - name: "date"
+        type: "datetime"
+        required: false
+        description: "Date de la fourniture"
+      - name: "statut"
+        type: "enum"
+        required: false
+        enum_values: ["actif", "suspendu"]
+        description: "Statut de la relation"
+
+  # ---- Méthanier → Terminal ----
+  LIVRE_A:
+    description: "Un méthanier livre à un terminal"
+    source: "Méthanier"
+    target: "Terminal"
+    cardinality: "N:1"
+    properties:
+      - name: "date"
+        type: "datetime"
+        required: true
+        description: "Date de livraison"
+      - name: "quantite"
+        type: "integer"
+        required: false
+        min: 0
+        description: "Quantité livrée"
+      - name: "statut"
+        type: "enum"
+        required: false
+        enum_values: ["planifie", "en_cours", "termine", "annule"]
+        description: "Statut de la livraison"
+
+  # ---- Terminal → Pipeline ----
+  ALIMENTE:
+    description: "Un terminal alimente un pipeline"
+    source: "Terminal"
+    target: "Pipeline"
+    cardinality: "N:M"
+    properties:
+      - name: "debit"
+        type: "float"
+        required: true
+        min: 0
+        description: "Débit en m³/s"
+      - name: "date"
+        type: "datetime"
+        required: false
+        description: "Date de l'alimentation"
+
+  # ---- Pipeline → Client ----
+  DESSERT:
+    description: "Un pipeline dessert un client"
+    source: "Pipeline"
+    target: "Client"
+    cardinality: "1:N"
+    properties:
+      - name: "volume"
+        type: "integer"
+        required: true
+        min: 0
+        description: "Volume distribué en m³"
+      - name: "contrat"
+        type: "string"
+        required: false
+        description: "Référence du contrat"
+
+  # ---- Terminal → Stockage ----
+  STOCKE:
+    description: "Un terminal stocke dans un stockage"
+    source: "Terminal"
+    target: "Stockage"
+    cardinality: "N:1"
+    properties:
+      - name: "capacite_utilisee"
+        type: "integer"
+        required: true
+        min: 0
+        description: "Capacité utilisée en m³"
+      - name: "date"
+        type: "datetime"
+        required: false
+        description: "Date du stockage"
+
+  # ---- Pipeline → Compresseur ----
+  DEPEND_DE:
+    description: "Un pipeline dépend d'un compresseur"
+    source: "Pipeline"
+    target: "Compresseur"
+    cardinality: "N:M"
+    properties:
+      - name: "type"
+        type: "enum"
+        required: true
+        enum_values: ["pression", "debit", "controle"]
+        default: "pression"
+        description: "Type de dépendance"
+
+  # ---- Incident → Équipement ----
+  AFFECTE:
+    description: "Un incident affecte un équipement"
+    source: "Incident"
+    target: "Entity"
+    cardinality: "N:M"
+    properties:
+      - name: "date"
+        type: "datetime"
+        required: true
+        description: "Date de l'affectation"
+      - name: "impact"
+        type: "enum"
+        required: false
+        enum_values: ["direct", "indirect", "potentiel"]
+        description: "Type d'impact"
+
+  # ---- Terminal → Commande ----
+  HISTORIQUE:
+    description: "Un terminal a un historique de commandes"
+    source: "Terminal"
+    target: "Commande"
+    cardinality: "1:N"
+    properties:
+      - name: "date"
+        type: "datetime"
+        required: true
+        description: "Date de l'historique"

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gnl-agents
+  namespace: gnl-knowledge-graph
+  labels:
+    app: gnl-agents
+    component: agents
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gnl-agents
+  template:
+    metadata:
+      labels:
+        app: gnl-agents
+        component: agents
+    spec:
+      containers:
+      - name: gnl-agents
+        image: gnl-agent:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8001
+          name: http
+        envFrom:
+        - configMapRef:
+            name: gnl-config
+        - secretRef:
+            name: gnl-secrets
+        env:
+        - name: NEO4J_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: gnl-secrets
+              key: neo4j-password
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1"

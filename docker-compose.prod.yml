@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  # ========================================================
+  # SERVICE BACKEND (FastAPI)
+  # ========================================================
+  backend:
+    build: ./backend
+    container_name: gnl-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend/data:/app/data
+    restart: unless-stopped
+
+  # ========================================================
+  # SERVICE FRONTEND (Next.js)
+  # ========================================================
+  frontend:
+    build: ./frontend
+    container_name: gnl-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    restart: unless-stopped

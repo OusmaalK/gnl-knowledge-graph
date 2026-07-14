@@ -1,0 +1,69 @@
+# ============================================================================
+# RELATION : AFFECTE
+# ============================================================================
+# Définition de la relation entre un incident et un équipement
+# ============================================================================
+
+relationship:
+  name: "AFFECTE"
+  description: "Un incident affecte un équipement"
+  
+  # ---------- Cardinalité ----------
+  source: "Incident"
+  target: "Entity"
+  cardinality: "N:M"
+  
+  # ---------- Visualisation ----------
+  visualization:
+    color: "#EF4444"
+    style: "dashed"
+    width: 3
+    label: "affecte"
+  
+  # ---------- Propriétés ----------
+  properties:
+    - name: "date"
+      type: "datetime"
+      required: true
+      description: "Date de l'affectation"
+      example: "2026-07-08T10:30:00Z"
+    
+    - name: "impact"
+      type: "enum"
+      required: false
+      enum_values: ["direct", "indirect", "potentiel"]
+      default: "direct"
+      description: "Type d'impact"
+      example: "direct"
+    
+    - name: "severite"
+      type: "enum"
+      required: false
+      enum_values: ["faible", "moyen", "eleve", "critique"]
+      default: "moyen"
+      description: "Sévérité de l'impact"
+      example: "critique"
+    
+    - name: "description"
+      type: "string"
+      required: false
+      description: "Description de l'affectation"
+      example: "Fuite majeure sur le pipeline"
+  
+  # ---------- Exemples ----------
+  examples:
+    - source: "INC-001"
+      target: "PIPE-001"
+      properties:
+        date: "2026-07-08T10:30:00Z"
+        impact: "direct"
+        severite: "critique"
+        description: "Fuite sur le pipeline Nord-Sud"
+    
+    - source: "INC-002"
+      target: "COMP-001"
+      properties:
+        date: "2026-07-05T14:20:00Z"
+        impact: "direct"
+        severite: "eleve"
+        description: "Compresseur en surchauffe"

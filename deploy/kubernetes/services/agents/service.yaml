@@ -1,0 +1,29 @@
+# ============================================================================
+# Service pour les Agents
+# ============================================================================
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: agents-service
+  namespace: gnl-knowledge-graph
+  labels:
+    app: gnl-agents
+    component: service
+spec:
+  selector:
+    app: gnl-agents
+  ports:
+  - name: http
+    port: 8001
+    targetPort: 8001
+    protocol: TCP
+  - name: grpc
+    port: 8002
+    targetPort: 8002
+    protocol: TCP
+  type: ClusterIP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800

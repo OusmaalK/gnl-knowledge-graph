@@ -1,0 +1,119 @@
+# ============================================================================
+# Monitoring Configuration
+# ============================================================================
+# Description: Configuration partagée du monitoring pour tous les environnements
+# ============================================================================
+
+# Prometheus
+prometheus:
+  enabled: true
+  port: 9090
+  path: "/metrics"
+  
+  # Métriques
+  metrics:
+    - name: "gnl_api_requests_total"
+      type: "counter"
+      description: "Total des requêtes API"
+      labels: ["endpoint", "method", "status"]
+    
+    - name: "gnl_api_request_duration_seconds"
+      type: "histogram"
+      description: "Durée des requêtes API"
+      labels: ["endpoint", "method"]
+      buckets: [0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]
+    
+    - name: "gnl_graph_queries_total"
+      type: "counter"
+      description: "Total des requêtes graphe"
+      labels: ["query_type"]
+    
+    - name: "gnl_graph_query_duration_seconds"
+      type: "histogram"
+      description: "Durée des requêtes graphe"
+      labels: ["query_type"]
+      buckets: [0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]
+    
+    - name: "gnl_agent_calls_total"
+      type: "counter"
+      description: "Total des appels agents"
+      labels: ["agent", "success"]
+    
+    - name: "gnl_agent_duration_seconds"
+      type: "histogram"
+      description: "Durée des appels agents"
+      labels: ["agent"]
+      buckets: [0.1, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0, 60.0]
+    
+    - name: "gnl_cache_hits_total"
+      type: "counter"
+      description: "Total des hits cache"
+      labels: ["cache"]
+    
+    - name: "gnl_cache_misses_total"
+      type: "counter"
+      description: "Total des misses cache"
+      labels: ["cache"]
+    
+    - name: "gnl_ingestion_records_total"
+      type: "counter"
+      description: "Total des enregistrements ingérés"
+      labels: ["source"]
+    
+    - name: "gnl_system_uptime_seconds"
+      type: "gauge"
+      description: "Temps de fonctionnement du système"
+    
+    - name: "gnl_system_memory_bytes"
+      type: "gauge"
+      description: "Mémoire utilisée"
+    
+    - name: "gnl_system_cpu_percent"
+      type: "gauge"
+      description: "Utilisation CPU"
+
+# Grafana
+grafana:
+  enabled: true
+  port: 3000
+  
+  dashboards:
+    - name: "GNL Overview"
+      file: "dashboards/overview.json"
+    
+    - name: "API Performance"
+      file: "dashboards/api.json"
+    
+    - name: "Neo4j"
+      file: "dashboards/neo4j.json"
+    
+    - name: "Agents"
+      file: "dashboards/agents.json"
+    
+    - name: "Business"
+      file: "dashboards/business.json"
+
+# OpenTelemetry
+otel:
+  enabled: true
+  endpoint: "otel-collector:4317"
+  sampling: 0.1
+
+# Health Checks
+health:
+  endpoints:
+    - name: "neo4j"
+      url: "bolt://neo4j:7687"
+      timeout: 5
+    
+    - name: "qdrant"
+      url: "http://qdrant:6333"
+      timeout: 5
+    
+    - name: "redis"
+      url: "redis://redis:6379"
+      timeout: 5
+    
+    - name: "kafka"
+      url: "kafka:9092"
+      timeout: 5

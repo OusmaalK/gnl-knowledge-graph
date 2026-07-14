@@ -1,0 +1,98 @@
+# ============================================================================
+# ENTITÉ : PIPELINE
+# ============================================================================
+# Définition du type de nœud Pipeline
+# ============================================================================
+
+entity:
+  name: "Pipeline"
+  description: "Pipeline de transport de GNL"
+  inherits: "StatusEntity"
+  
+  # ---------- Visualisation ----------
+  visualization:
+    color: "#F59E0B"
+    icon: "pipe"
+    shape: "roundrectangle"
+    size: 60
+  
+  # ---------- Propriétés ----------
+  properties:
+    - name: "id"
+      type: "string"
+      required: true
+      pattern: "^PIPE-\\d{3,4}$"
+      description: "Identifiant unique du pipeline"
+      example: "PIPE-001"
+    
+    - name: "nom"
+      type: "string"
+      required: true
+      description: "Nom du pipeline"
+      example: "Nord-Sud"
+    
+    - name: "longueur_km"
+      type: "integer"
+      required: true
+      min: 0
+      description: "Longueur en kilomètres"
+      example: 200
+    
+    - name: "depart"
+      type: "string"
+      required: false
+      description: "ID du terminal de départ"
+      example: "TERM-001"
+    
+    - name: "arrivee"
+      type: "string"
+      required: false
+      description: "ID du terminal d'arrivée"
+      example: "TERM-002"
+    
+    - name: "pression_max_bar"
+      type: "integer"
+      required: true
+      min: 0
+      description: "Pression maximale en bars"
+      example: 80
+    
+    - name: "statut"
+      type: "enum"
+      required: true
+      enum_values: ["actif", "en_test", "maintenance", "hors_service"]
+      default: "actif"
+      description: "Statut du pipeline"
+      example: "actif"
+    
+    - name: "created_at"
+      type: "datetime"
+      required: false
+      description: "Date de création"
+    
+    - name: "updated_at"
+      type: "datetime"
+      required: false
+      description: "Date de dernière mise à jour"
+  
+  # ---------- Relations ----------
+  relationships:
+    - type: "ALIMENTE"
+      target: "Terminal"
+      cardinality: "N:M"
+      description: "Un pipeline alimente des terminaux"
+    
+    - type: "DESSERT"
+      target: "Client"
+      cardinality: "1:N"
+      description: "Un pipeline dessert des clients"
+    
+    - type: "DEPEND_DE"
+      target: "Compresseur"
+      cardinality: "N:M"
+      description: "Un pipeline dépend de compresseurs"
+    
+    - type: "AFFECTE"
+      target: "Incident"
+      cardinality: "1:N"
+      description: "Un pipeline est affecté par des incidents"

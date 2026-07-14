@@ -1,0 +1,57 @@
+# ============================================================================
+# ConfigMap GNL Graph
+# ============================================================================
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "gnl-graph.fullname" . }}-config
+  namespace: {{ .Values.global.namespace | default "gnl-knowledge-graph" }}
+  labels:
+    {{- include "gnl-graph.labels" . | nindent 4 }}
+data:
+  # Environment
+  ENV: {{ .Values.global.environment | default "dev" | quote }}
+  LOG_LEVEL: {{ .Values.logging.level | default "INFO" | quote }}
+  
+  # Neo4j
+  NEO4J_URI: {{ include "gnl-graph.neo4j.url" . | quote }}
+  NEO4J_USER: {{ .Values.neo4j.auth.username | default "neo4j" | quote }}
+  
+  # Qdrant
+  QDRANT_HOST: {{ printf "%s-qdrant" .Release.Name | quote }}
+  QDRANT_PORT: {{ .Values.qdrant.service.ports.http | default "6333" | quote }}
+  
+  # Kafka
+  KAFKA_BOOTSTRAP_SERVERS: {{ include "gnl-graph.kafka.url" . | quote }}
+  KAFKA_GROUP_ID: {{ .Values.kafka.groupId | default "gnl-group" | quote }}
+  KAFKA_AUTO_OFFSET_RESET: {{ .Values.kafka.autoOffsetReset | default "earliest" | quote }}
+  
+  # Redis
+  REDIS_HOST: {{ printf "%s-redis" .Release.Name | quote }}
+  REDIS_PORT: {{ .Values.redis.service.port | default "6379" | quote }}
+  
+  # API
+  API_HOST: {{ .Values.api.service.host | default "0.0.0.0" | quote }}
+  API_PORT: {{ .Values.api.service.port | default "8000" | quote }}
+  API_ACCESS_TOKEN_EXPIRE_MINUTES: {{ .Values.api.tokenExpireMinutes | default "30" | quote }}
+  
+  # LLM
+  LLM_MODEL: {{ .Values.llm.model | default "llama3:70b" | quote }}
+  LLM_API_URL: {{ .Values.llm.apiUrl | default "http://ollama:11434" | quote }}
+  LLM_EMBEDDING_MODEL: {{ .Values.llm.embeddingModel | default "BGE-M3" | quote }}
+  
+  # Storage
+  S3_ENDPOINT: {{ .Values.storage.s3.endpoint | default "minio:9000" | quote }}
+  S3_BUCKET_RAW: {{ .Values.storage.s3.buckets.raw | default "gnl-raw" | quote }}
+  S3_BUCKET_PROCESSED: {{ .Values.storage.s3.buckets.processed | default "gnl-processed" | quote }}
+  
+  # Monitoring
+  PROMETHEUS_PORT: {{ .Values.monitoring.prometheus.port | default "9090" | quote }}
+  GRAFANA_PORT: {{ .Values.monitoring.grafana.port | default "3000" | quote }}
+  OTEL_EXPORTER_OTLP_ENDPOINT: {{ .Values.monitoring.otelEndpoint | default "otel-collector:4317" | quote }}
+  
+  # Feature flags
+  FEATURE_GRAPH_RAG: {{ .Values.features.graphRag | default "true" | quote }}
+  FEATURE_AGENTS: {{ .Values.features.agents | default "true" | quote }}
+  FEATURE_AUTO_INGESTION: {{ .Values.features.autoIngestion | default "true" | quote }}

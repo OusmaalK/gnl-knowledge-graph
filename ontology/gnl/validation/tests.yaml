@@ -1,0 +1,94 @@
+# ============================================================================
+# TESTS DE VALIDATION
+# ============================================================================
+# Tests pour valider l'ontologie GNL
+# ============================================================================
+
+tests:
+  # ---------- Validation des IDs ----------
+  test_ids:
+    - name: "Valid Fournisseur ID"
+      entity: "Fournisseur"
+      id: "FOUR-001"
+      expected: true
+    
+    - name: "Invalid Fournisseur ID"
+      entity: "Fournisseur"
+      id: "FOUR-01"
+      expected: false
+    
+    - name: "Valid Pipeline ID"
+      entity: "Pipeline"
+      id: "PIPE-001"
+      expected: true
+    
+    - name: "Invalid Pipeline ID"
+      entity: "Pipeline"
+      id: "PIPE-01"
+      expected: false
+  
+  # ---------- Validation des Propriétés ----------
+  test_properties:
+    - name: "Valid Pipeline Properties"
+      entity: "Pipeline"
+      properties:
+        id: "PIPE-001"
+        nom: "Nord-Sud"
+        longueur_km: 200
+        pression_max_bar: 80
+        statut: "actif"
+      expected: true
+    
+    - name: "Missing Required Property"
+      entity: "Pipeline"
+      properties:
+        id: "PIPE-001"
+        nom: "Nord-Sud"
+      expected: false
+    
+    - name: "Invalid Enum Value"
+      entity: "Pipeline"
+      properties:
+        id: "PIPE-001"
+        nom: "Nord-Sud"
+        longueur_km: 200
+        pression_max_bar: 80
+        statut: "invalid"
+      expected: false
+  
+  # ---------- Validation des Relations ----------
+  test_relationships:
+    - name: "Valid FOURNIT Relationship"
+      relationship: "FOURNIT"
+      source: "Fournisseur"
+      target: "Terminal"
+      properties:
+        quantite: 100000
+        date: "2026-01-01T00:00:00Z"
+      expected: true
+    
+    - name: "Invalid Relationship Target"
+      relationship: "FOURNIT"
+      source: "Fournisseur"
+      target: "Pipeline"
+      expected: false
+  
+  # ---------- Validation des Requêtes ----------
+  test_queries:
+    - name: "Get Pipeline by ID"
+      query: |
+        MATCH (p:Pipeline {id: 'PIPE-001'})
+        RETURN p
+      expected: "pipeline found"
+    
+    - name: "Get Clients by Pipeline"
+      query: |
+        MATCH (p:Pipeline {id: 'PIPE-001'})-[:DESSERT]->(c:Client)
+        RETURN c
+      expected: "clients found"
+    
+    - name: "Get Incidents by Equipment"
+      query: |
+        MATCH (i:Incident)-[:AFFECTE]->(e {id: 'PIPE-001'})
+        RETURN i
+      expected: "incidents found"

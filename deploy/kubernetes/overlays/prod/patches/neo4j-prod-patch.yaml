@@ -1,0 +1,31 @@
+# ============================================================================
+# Patch Neo4j - Production
+# ============================================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neo4j
+  namespace: gnl-knowledge-graph
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+      - name: neo4j
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2"
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+        env:
+        - name: NEO4J_dbms_memory_heap_initial__size
+          value: "2g"
+        - name: NEO4J_dbms_memory_heap_max__size
+          value: "8g"
+        - name: NEO4J_dbms_memory_pagecache_size
+          value: "4g"
+        - name: NEO4J_dbms_connector_bolt_advertised_address
+          value: "neo4j-service:7687"

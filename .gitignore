@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+*.log
+
+# Poetry
+poetry.lock
+poetry.toml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Project specific
+data/
+logs/
+*.db
+*.sqlite
+.env
+.env.local
+.env.*.local
+
+# Docker
+*.pid
+*.pid.lock
+
+# Kubernetes
+*.kubeconfig
+*.pem
+*.crt
+*.key
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Secrets
+secrets.yaml
+*.secret

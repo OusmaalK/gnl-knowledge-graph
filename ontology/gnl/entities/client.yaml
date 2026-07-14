@@ -1,0 +1,81 @@
+# ============================================================================
+# ENTITÉ : CLIENT
+# ============================================================================
+# Définition du type de nœud Client
+# ============================================================================
+
+entity:
+  name: "Client"
+  description: "Client final de GNL"
+  inherits: "Organization"
+  
+  # ---------- Visualisation ----------
+  visualization:
+    color: "#EF4444"
+    icon: "user"
+    shape: "roundrectangle"
+    size: 55
+  
+  # ---------- Propriétés ----------
+  properties:
+    - name: "id"
+      type: "string"
+      required: true
+      pattern: "^CLIENT-\\d{3,4}$"
+      description: "Identifiant unique du client"
+      example: "CLIENT-001"
+    
+    - name: "nom"
+      type: "string"
+      required: true
+      description: "Nom du client"
+      example: "EDF"
+    
+    - name: "contrat"
+      type: "string"
+      required: false
+      description: "Référence du contrat"
+      example: "GNL-2026-001"
+    
+    - name: "volume_contractuel"
+      type: "integer"
+      required: false
+      min: 0
+      description: "Volume contractuel en m³"
+      example: 500000
+    
+    - name: "secteur"
+      type: "string"
+      required: false
+      description: "Secteur d'activité du client"
+      example: "Production d'énergie"
+    
+    - name: "statut"
+      type: "enum"
+      required: true
+      enum_values: ["actif", "inactif", "suspendu"]
+      default: "actif"
+      description: "Statut du client"
+      example: "actif"
+    
+    - name: "created_at"
+      type: "datetime"
+      required: false
+      description: "Date de création"
+    
+    - name: "updated_at"
+      type: "datetime"
+      required: false
+      description: "Date de dernière mise à jour"
+  
+  # ---------- Relations ----------
+  relationships:
+    - type: "DESSERT"
+      target: "Pipeline"
+      cardinality: "N:1"
+      description: "Un client est desservi par un pipeline"
+    
+    - type: "CONTRACTUALISE"
+      target: "Contrat"
+      cardinality: "1:N"
+      description: "Un client a des contrats"
