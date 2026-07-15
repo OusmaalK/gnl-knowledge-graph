@@ -31,6 +31,8 @@ python-multipart==0.0.6
 # -----------------------------------------------------------------------------
 langchain==0.0.340
 langgraph==0.0.15
+passlib[bcrypt]
+python-dotenv
 langchain-community==0.0.10
 langchain-core==0.0.10
 ollama==0.1.0
