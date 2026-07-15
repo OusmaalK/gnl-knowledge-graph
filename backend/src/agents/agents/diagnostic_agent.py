@@ -8,6 +8,15 @@ import logging
 # IMPORTANT : Importation de votre outil LLM
 from ..tools.llm_tools import LLMTools 
 
+# --- CORRECTION AJOUTÉE POUR CHARGER LE .ENV ---
+from dotenv import load_dotenv
+# import os
+
+# Ce chemin remonte jusqu'à la racine du dossier 'backend' pour trouver le .env
+# dotenv_path = os.path.join(os.path.dirname(__file__), '../../../../.env')
+load_dotenv(override=True)
+# ------------------------------------------------
+
 logger = logging.getLogger(__name__)
 
 class DiagnosticAgent(BaseAgent):
