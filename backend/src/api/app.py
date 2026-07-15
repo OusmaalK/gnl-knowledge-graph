@@ -220,20 +220,33 @@ def create_app() -> FastAPI:
             return {"email": record["u"]["email"], "role": record["u"]["role"]}
         except JWTError:
             raise HTTPException(status_code=401, detail="Token invalide")
-
     @app.post("/api/auth/register")
     async def register_user(user_data: UserRegister):
         try:
-            # --- CORRECTIONS POUR RAILWAY ---
             import os
-            from backend.src.core.security import get_password_hash
+            import sys
             from dotenv import load_dotenv
             
-            # Railway n'a pas de fichier .env physique, on lit directement l'environnement
+            # CHARGEMENT FORCÉ DES VARIABLES (sans fichier .env)
             load_dotenv(override=True)
-            # ---------------------------------
             
-            driver = GraphDatabase.driver(os.getenv("NEO4J_URI"), auth=(os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASSWORD")))
+            # IMPORTATION ABSOLUE VIA LE CHEMIN DU DISQUE (100% fiable)
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            backend_root = os.path.dirname(os.path.dirname(current_dir))  # remonte jusqu'à backend/
+            sys.path.insert(0, backend_root)  # Ajoute le backend au path Python
+            
+            from src.core.security import get_password_hash
+            
+            # --------- Connexion Neo4j ---------
+            uri = os.getenv("NEO4J_URI")
+            user = os.getenv("NEO4J_USER")
+            password = os.getenv("NEO4J_PASSWORD")
+            
+            if not uri or not user or not password:
+                raise HTTPException(status_code=500, detail="Variables d'environnement Neo4j manquantes sur Railway")
+            
+            driver = GraphDatabase.driver(uri, auth=(user, password))
+            # ----------------------------------
             
             with driver.session() as session:
                 # 1. Vérifier si l'email existe déjà
@@ -244,7 +257,7 @@ def create_app() -> FastAPI:
                 # 2. Hacher le mot de passe
                 hashed_password = get_password_hash(user_data.password)
                 
-                # 3. Créer le nœud User dans Neo4j (statut 'pending' par défaut)
+                # 3. Créer le nœud User dans Neo4j
                 session.run("""
                 CREATE (u:User {
                     email: $email,
@@ -261,7 +274,8 @@ def create_app() -> FastAPI:
             raise
         except Exception as e:
             logger.error(f"❌ Erreur lors de l'inscription: {e}")
-            raise HTTPException(status_code=500, detail="Erreur interne du serveur")
+            raise HTTPException(status_code=500, detail=f"Erreur interne: {str(e)}")
+    
     @app.post("/api/auth/login")
     async def login_user(user_data: UserLogin):
         try:
