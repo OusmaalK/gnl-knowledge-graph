@@ -224,9 +224,14 @@ def create_app() -> FastAPI:
     @app.post("/api/auth/register")
     async def register_user(user_data: UserRegister):
         try:
+            # --- CORRECTIONS POUR RAILWAY ---
+            import os
+            from backend.src.core.security import get_password_hash
             from dotenv import load_dotenv
-            env_path = os.path.join(os.path.dirname(__file__), '../../.env')
-            load_dotenv(env_path, override=True)
+            
+            # Railway n'a pas de fichier .env physique, on lit directement l'environnement
+            load_dotenv(override=True)
+            # ---------------------------------
             
             driver = GraphDatabase.driver(os.getenv("NEO4J_URI"), auth=(os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASSWORD")))
             
@@ -257,7 +262,6 @@ def create_app() -> FastAPI:
         except Exception as e:
             logger.error(f"❌ Erreur lors de l'inscription: {e}")
             raise HTTPException(status_code=500, detail="Erreur interne du serveur")
-
     @app.post("/api/auth/login")
     async def login_user(user_data: UserLogin):
         try:
