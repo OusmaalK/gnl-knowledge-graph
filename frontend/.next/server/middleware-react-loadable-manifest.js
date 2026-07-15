@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}"
+self.__REACT_LOADABLE_MANIFEST="{\"components\\\\graph\\\\GraphVisualization.js -> cytoscape\":{\"id\":\"components\\\\graph\\\\GraphVisualization.js -> cytoscape\",\"files\":[\"static/chunks/_app-pages-browser_node_modules_cytoscape_dist_cytoscape_esm_mjs.js\"]}}"
