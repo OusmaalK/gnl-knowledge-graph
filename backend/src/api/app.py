@@ -18,7 +18,7 @@ from neo4j import GraphDatabase
 # Import pour le JWT
 from jose import JWTError
 from fastapi.security import OAuth2PasswordBearer
-from ..core.security import verify_password, get_password_hash, create_access_token, ALGORITHM
+# from ..core.security import verify_password, get_password_hash, create_access_token, ALGORITHM
 from .routers import graph, agents, queries, health
 from .middleware import logging as logging_middleware
 from .middleware import metrics as metrics_middleware
@@ -261,9 +261,13 @@ def create_app() -> FastAPI:
     @app.post("/api/auth/login")
     async def login_user(user_data: UserLogin):
         try:
+            # IMPORTATIONS CRUCIALES POUR RAILWAY
+            import os
+            from backend.src.core.security import verify_password, get_password_hash, create_access_token, ALGORITHM
             from dotenv import load_dotenv
-            env_path = os.path.join(os.path.dirname(__file__), '../../.env')
-            load_dotenv(env_path, override=True)
+            
+            # Railway n'a pas de fichier .env, on ne charge que depuis l'environnement système
+            load_dotenv(override=True)
             
             driver = GraphDatabase.driver(os.getenv("NEO4J_URI"), auth=(os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASSWORD")))
             
@@ -295,7 +299,6 @@ def create_app() -> FastAPI:
         except Exception as e:
             logger.error(f"❌ Erreur lors de la connexion: {e}")
             raise HTTPException(status_code=500, detail="Erreur interne du serveur")
-
     @app.get("/api/auth/me")
     async def read_users_me(current_user: dict = Depends(get_current_user)):
         return {"email": current_user["email"], "role": current_user["role"]}
