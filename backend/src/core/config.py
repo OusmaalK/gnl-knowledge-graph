@@ -14,10 +14,10 @@ class Settings(BaseSettings):
     DEBUG: bool = Field(True, env="DEBUG")
     LOG_LEVEL: str = Field("INFO", env="LOG_LEVEL")
     
-    # --- CORRECTION ICI (Ligne 14) ---
-    # Ligne corrigée pour utiliser Field() et des guillemets, ce qui résout l'erreur SyntaxError
-    NEO4J_URI: str = Field("neo4j://6f8b0c72.databases.neo4j.io:7687", env="NEO4J_URI")
-    # ----------------------------------
+    NEO4J_URI: str = Field(
+    "neo4j+s://618e0c72.databases.neo4j.io",
+    env="NEO4J_URI"
+)
     
     NEO4J_USER: str = Field("neo4j", env="NEO4J_USER")
     NEO4J_PASSWORD: str = Field("", env="NEO4J_PASSWORD")
