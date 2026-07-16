@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = Field("INFO", env="LOG_LEVEL")
     
     # Neo4j
-    NEO4J_URI: str = Field("bolt://localhost:7687", env="NEO4J_URI")
+    NEO4J_URI=neo4j://6f8b0c72.databases.neo4j.io:7687
     NEO4J_USER: str = Field("neo4j", env="NEO4J_USER")
     NEO4J_PASSWORD: str = Field("", env="NEO4J_PASSWORD")
     
