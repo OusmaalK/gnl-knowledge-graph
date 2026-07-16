@@ -40,15 +40,11 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(30, env="API_ACCESS_TOKEN_EXPIRE_MINUTES")
     
     # CORS
+        # CORS
     CORS_ORIGINS: List[str] = Field(
-    [
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://localhost:3002",
-        "https://gnl-knowledge-graph.vercel.app",
-        "https://gnl-knowledge-graph-m6jge961j-ousmaalks-projects.vercel.app"
-    ],
-    env="CORS_ORIGINS"
+        ["*"],
+        env="CORS_ORIGINS"
+    )
     
     # JWT
     JWT_SECRET: str = Field("change_me", env="JWT_SECRET")
