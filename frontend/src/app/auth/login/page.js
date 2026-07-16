@@ -55,22 +55,39 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Utilisation d'un fetch standard sans headers additionnels
+      // 1. Vérification et nettoyage des données
+      const cleanEmail = email.trim();
+      const cleanPassword = password.trim();
+
+      // 2. Récupération robuste de l'URL
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://gnl-knowledge-graph-production.up.railway.app';
+      console.log("🔗 Envoi vers:", `${API_URL}/api/auth/login`);
+
+      // 3. Appel fetch avec gestion des erreurs réseau
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ 
+          email: cleanEmail, 
+          password: cleanPassword 
+        }),
       });
 
-      // Lecture du corps de la réponse
-      const data = await response.json();
+      // 4. Lecture du corps de la réponse
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        // Si le serveur ne répond pas avec du JSON valide
+        throw new Error("Le serveur n'a pas renvoyé une réponse valide.");
+      }
 
-      // Gestion des erreurs serveur
+      // 5. Gestion des erreurs serveur
       if (!response.ok) {
         // Si le backend renvoie un message d'erreur, on l'affiche
-        const errorMsg = data.detail || 'Erreur inconnue lors de la connexion';
+        const errorMsg = data.detail || `Erreur serveur (${response.status})`;
         toast.error(errorMsg);
         throw new Error(errorMsg);
       }
