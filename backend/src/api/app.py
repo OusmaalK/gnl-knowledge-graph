@@ -245,7 +245,7 @@ def create_app() -> FastAPI:
             if not uri or not user or not password:
                 raise HTTPException(status_code=500, detail="Variables d'environnement Neo4j manquantes sur Railway")
             
-            driver = GraphDatabase.driver(uri, auth=(user, password))
+            driver = GraphDatabase.driver("neo4j://6f8b0c72.databases.neo4j.io:7687", auth=(os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASSWORD")))
             # ----------------------------------
             
             with driver.session() as session:
@@ -289,7 +289,7 @@ def create_app() -> FastAPI:
             # Railway n'a pas de fichier .env, on ne charge que depuis l'environnement système
             load_dotenv(override=True)
             
-            driver = GraphDatabase.driver(os.getenv("NEO4J_URI"), auth=(os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASSWORD")))
+            driver = GraphDatabase.driver("neo4j://6f8b0c72.databases.neo4j.io:7687", auth=(os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASSWORD")))
             
             with driver.session() as session:
                 # 1. Chercher l'utilisateur dans Neo4j
