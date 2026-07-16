@@ -400,49 +400,63 @@ def create_app() -> FastAPI:
             # ==========================================
             # 2. ENVOI D'EMAIL VIA BREVO
             # ==========================================
-            configuration = sib_api_v3_sdk.Configuration()
-            configuration.api_key['api-key'] = os.getenv("BREVO_API_KEY")
-            api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
-
-            sender_email = os.getenv("BREVO_SENDER_EMAIL", "admin@gnl.com")
-            sender_name = os.getenv("BREVO_SENDER_NAME", "GNL Knowledge Graph")
-
-            send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
-                to=[{"email": email, "name": email.split("@")[0]}],
-                sender={"name": sender_name, "email": sender_email},
-                subject="✅ Votre compte GNL Knowledge Graph est approuvé !",
-                html_content=f"""
-                <html>
-                    <body style="font-family: Arial, sans-serif; color: #333;">
-                        <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                            <div style="text-align: center; margin-bottom: 20px;">
-                                <h1 style="color: #1e3a8a;">⛽ GNL Knowledge Graph</h1>
-                            </div>
-                            <h2>Félicitations {email.split('@')[0]} !</h2>
-                            <p>Votre compte a été <strong>approuvé</strong> par l'administrateur.</p>
-                            <p>Vous avez désormais le rôle : <strong style="color: #2563eb;">{new_role}</strong></p>
-                            <div style="background-color: #f0f9ff; padding: 15px; border-radius: 8px; margin-top: 20px;">
-                                <p>Vous pouvez maintenant vous connecter à la plateforme :</p>
-                                <a href="http://localhost:3000/auth/login" style="display: inline-block; background-color: #1e3a8a; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
-                                    Se connecter
-                                </a>
-                            </div>
-                            <p style="margin-top: 20px; font-size: 12px; color: #888;">L'équipe GNL Knowledge Graph</p>
-                        </div>
-                    </body>
-                </html>
-                """
-            )
-
+            email_sent = False
             try:
+                configuration = sib_api_v3_sdk.Configuration()
+                configuration.api_key['api-key'] = os.getenv("BREVO_API_KEY")
+                api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+
+                sender_email = os.getenv("BREVO_SENDER_EMAIL", "admin@gnl.com")
+                sender_name = os.getenv("BREVO_SENDER_NAME", "GNL Knowledge Graph")
+
+                send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+                    to=[{"email": email, "name": email.split("@")[0]}],
+                    sender={"name": sender_name, "email": sender_email},
+                    subject="✅ Votre compte GNL Knowledge Graph est approuvé !",
+                    html_content=f"""
+                    <html>
+                        <body style="font-family: Arial, sans-serif; color: #333;">
+                            <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                                <div style="text-align: center; margin-bottom: 20px;">
+                                    <h1 style="color: #1e3a8a;">⛽ GNL Knowledge Graph</h1>
+                                </div>
+                                <h2>Félicitations {email.split('@')[0]} !</h2>
+                                <p>Votre compte a été <strong>approuvé</strong> par l'administrateur.</p>
+                                <p>Vous avez désormais le rôle : <strong style="color: #2563eb;">{new_role}</strong></p>
+                                <div style="background-color: #f0f9ff; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                                    <p>Vous pouvez maintenant vous connecter à la plateforme :</p>
+                                    <a href="http://localhost:3000/auth/login" style="display: inline-block; background-color: #1e3a8a; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+                                        Se connecter
+                                    </a>
+                                </div>
+                                <p style="margin-top: 20px; font-size: 12px; color: #888;">L'équipe GNL Knowledge Graph</p>
+                            </div>
+                        </body>
+                    </html>
+                    """
+                )
+
                 api_response = api_instance.send_transac_email(send_smtp_email)
                 logger.info(f"📧 Email envoyé avec succès à {email}")
+                email_sent = True
+
             except ApiException as e:
                 logger.error(f"❌ Erreur lors de l'envoi de l'email: {e}")
+                email_sent = False
+            except Exception as e:
+                logger.error(f"❌ Erreur inconnue lors de l'envoi de l'email: {e}")
+                email_sent = False
 
-            return {"message": f"Utilisateur {email} approuvé avec le rôle {new_role}. Email envoyé."}
+            # ==========================================
+            # 3. RETOURNER LE SUCCÈS AVEC LE STATUT DE L'EMAIL
+            # ==========================================
+            if email_sent:
+                return {"message": f"Utilisateur {email} approuvé avec le rôle {new_role}. Email envoyé avec succès."}
+            else:
+                return {"message": f"Utilisateur {email} approuvé avec le rôle {new_role}. (Email non envoyé, vérifiez la configuration Brevo)."}
+
         except Exception as e:
-            logger.error(f"❌ Erreur lors de l'approbation: {e}")
+            logger.error(f"❌ Erreur critique lors de l'approbation: {e}")
             raise HTTPException(status_code=500, detail="Erreur interne")
     
     
