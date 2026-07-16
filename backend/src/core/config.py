@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     # Neo4j
     NEO4J_URI: str = Field("neo4j+s://618e0c72.databases.neo4j.io:7687", env="NEO4J_URI")
     NEO4J_USER: str = Field("neo4j", env="NEO4J_USER")
-    NEO4J_PASSWORD: str = Field("GnL_Neo4j_2026_Secure!", env="NEO4J_PASSWORD")
+    NEO4J_PASSWORD: str = Field("khaled20262026", env="NEO4J_PASSWORD")
     
     # Redis
     REDIS_HOST: str = Field("localhost", env="REDIS_HOST")
@@ -40,7 +40,6 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(30, env="API_ACCESS_TOKEN_EXPIRE_MINUTES")
     
     # CORS
-        # CORS
     CORS_ORIGINS: List[str] = Field(
         ["*"],
         env="CORS_ORIGINS"
