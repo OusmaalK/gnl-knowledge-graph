@@ -225,7 +225,20 @@ def create_app() -> FastAPI:
     @app.post("/api/auth/register")
     async def register_user(user_data: UserRegister):
         try:
-            driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
+            # --- RÉCUPÉRATION SÉCURISÉE DES IDENTIFIANTS NEO4J ---
+            import os
+            neo4j_uri = os.getenv("NEO4J_URI")
+            neo4j_user = os.getenv("NEO4J_USER")
+            neo4j_password = os.getenv("NEO4J_PASSWORD")
+            
+            if not neo4j_uri or not neo4j_user or not neo4j_password:
+                raise HTTPException(
+                    status_code=500, 
+                    detail=f"Configuration Neo4j manquante sur Railway. URI: {neo4j_uri is not None}, User: {neo4j_user is not None}, Password: {neo4j_password is not None}"
+                )
+            
+            driver = GraphDatabase.driver(neo4j_uri, auth=(neo4j_user, neo4j_password))
+            # ----------------------------------------------------
             
             with driver.session() as session:
                 # 1. Vérifier si l'email existe déjà
@@ -260,7 +273,20 @@ def create_app() -> FastAPI:
     @app.post("/api/auth/login")
     async def login_user(user_data: UserLogin):
         try:
-            driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
+            # --- RÉCUPÉRATION SÉCURISÉE DES IDENTIFIANTS NEO4J ---
+            import os
+            neo4j_uri = os.getenv("NEO4J_URI")
+            neo4j_user = os.getenv("NEO4J_USER")
+            neo4j_password = os.getenv("NEO4J_PASSWORD")
+            
+            if not neo4j_uri or not neo4j_user or not neo4j_password:
+                raise HTTPException(
+                    status_code=500, 
+                    detail=f"Configuration Neo4j manquante sur Railway. URI: {neo4j_uri is not None}, User: {neo4j_user is not None}, Password: {neo4j_password is not None}"
+                )
+            
+            driver = GraphDatabase.driver(neo4j_uri, auth=(neo4j_user, neo4j_password))
+            # ----------------------------------------------------
             
             with driver.session() as session:
                 # 1. Chercher l'utilisateur dans Neo4j
@@ -290,11 +316,39 @@ def create_app() -> FastAPI:
         except Exception as e:
             logger.error(f"❌ Erreur lors de la connexion: {e}")
             raise HTTPException(status_code=500, detail="Erreur interne du serveur")
-
-    @app.get("/api/auth/me")
-    async def read_users_me(current_user: dict = Depends(get_current_user)):
-        return {"email": current_user["email"], "role": current_user["role"]}
-    # ========================================================
+    async def get_current_user(token: str = Depends(oauth2_scheme)):
+        try:
+            payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[ALGORITHM])
+            email: str = payload.get("sub")
+            if email is None:
+                raise HTTPException(status_code=401, detail="Token invalide")
+            
+            # --- RÉCUPÉRATION SÉCURISÉE DES IDENTIFIANTS NEO4J ---
+            import os
+            neo4j_uri = os.getenv("NEO4J_URI")
+            neo4j_user = os.getenv("NEO4J_USER")
+            neo4j_password = os.getenv("NEO4J_PASSWORD")
+            
+            if not neo4j_uri or not neo4j_user or not neo4j_password:
+                raise HTTPException(
+                    status_code=500, 
+                    detail=f"Configuration Neo4j manquante pour get_current_user. URI: {neo4j_uri is not None}, User: {neo4j_user is not None}, Password: {neo4j_password is not None}"
+                )
+            
+            driver = GraphDatabase.driver(neo4j_uri, auth=(neo4j_user, neo4j_password))
+            # ----------------------------------------------------
+            
+            with driver.session() as session:
+                result = session.run("MATCH (u:User {email: $email}) RETURN u", email=email)
+                record = result.single()
+            driver.close()
+            
+            if not record:
+                raise HTTPException(status_code=401, detail="Utilisateur non trouvé")
+            
+            return {"email": record["u"]["email"], "role": record["u"]["role"]}
+        except JWTError:
+            raise HTTPException(status_code=401, detail="Token invalide")
 
     # ========================================================
     # ROUTES ADMIN USERS (GESTION UTILISATEURS)
