@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { useApi } from '@/hooks/useApi';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 function WorkflowColumn() {
@@ -42,47 +43,76 @@ function WorkflowColumn() {
 
   return (
     <aside className="hidden lg:flex lg:w-1/3 xl:w-2/5 bg-gradient-to-br from-blue-900 to-indigo-900 text-white p-12 flex-col justify-center overflow-y-auto">
+
       <div className="mb-10">
+
         <div className="text-5xl mb-4">⛽</div>
-        <h1 className="text-4xl font-bold mb-3">GNL Knowledge Graph</h1>
-        <p className="text-blue-200">Plateforme intelligente pour le transport du Gaz Naturel Liquéfié.</p>
+
+        <h1 className="text-4xl font-bold mb-3">
+          GNL Knowledge Graph
+        </h1>
+
+        <p className="text-blue-200">
+          Plateforme intelligente pour le transport du Gaz Naturel Liquéfié.
+        </p>
+
       </div>
+
       <div className="space-y-5">
+
         {workflows.map((item) => (
-          <div key={item.title} className="rounded-xl bg-white/10 border border-white/10 p-5">
+
+          <div
+            key={item.title}
+            className="rounded-xl bg-white/10 border border-white/10 p-5"
+          >
+
             <div className="flex gap-4">
-              <div className="text-3xl">{item.icon}</div>
-              <div>
-                <h3 className="font-semibold text-lg">{item.title}</h3>
-                <p className="text-blue-200 text-sm mt-1">{item.desc}</p>
+
+              <div className="text-3xl">
+                {item.icon}
               </div>
+
+              <div>
+
+                <h3 className="font-semibold text-lg">
+                  {item.title}
+                </h3>
+
+                <p className="text-blue-200 text-sm mt-1">
+                  {item.desc}
+                </p>
+
+              </div>
+
             </div>
+
           </div>
+
         ))}
+
       </div>
+
     </aside>
   );
 }
 
 export default function RegisterPage() {
+
   const router = useRouter();
+  const { post } = useApi();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // États pour gérer le succès de l'inscription
+  // --- NOUVEAU : ÉTAT POUR AFFICHER LE MESSAGE DE CONFIRMATION ---
   const [isRegistered, setIsRegistered] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
-
-  // URL du backend via variable d'environnement
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://gnl-knowledge-graph-production.up.railway.app';
-
   async function handleSubmit(e) {
     e.preventDefault();
-
-    // 1. Vérification de la confirmation du mot de passe
+    
     if (password !== confirmPassword) {
       toast.error('Les mots de passe ne correspondent pas');
       return;
@@ -90,42 +120,45 @@ export default function RegisterPage() {
 
     setLoading(true);
 
+    // --- RÉCUPÉRATION DE L'URL DE L'API ---
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://gnl-knowledge-graph-production.up.railway.app';
+
     try {
-      // 2. Appel au backend avec fetch standard
+      // --- REMPLACEMENT DE POST() PAR FETCH() STANDARD ---
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email,
-          password,
+          email: email,
+          password: password,
         }),
       });
 
-      // Lire la réponse du backend
       const data = await response.json();
 
-      // 3. Gérer les erreurs renvoyées par le backend
       if (!response.ok) {
+        // Si le backend renvoie une erreur (400, 500...), on utilise son message
         const errorMsg = data.detail || "Erreur lors de l'inscription.";
         toast.error(errorMsg);
         throw new Error(errorMsg);
       }
 
-      // 4. Succès de l'inscription
+      // --- SUCCÈS ---
       setRegisteredEmail(email);
       setIsRegistered(true);
-      toast.success(data.message || "Compte créé ! En attente d'approbation.");
+      toast.success(data.message || 'Compte créé ! En attente d\'approbation.');
 
     } catch (error) {
+      // L'erreur est déjà affichée via toast, mais on log pour le debug
       console.error('Register error:', error);
     } finally {
       setLoading(false);
     }
   }
 
-  // --- AFFICHAGE DE L'ÉCRAN DE SUCCÈS APRÈS INSCRIPTION ---
+  // --- SI L'INSCRIPTION EST RÉUSSIE, ON AFFICHE LE MESSAGE ---
   if (isRegistered) {
     return (
       <div className="flex min-h-screen w-full bg-gray-100">
@@ -149,22 +182,45 @@ export default function RegisterPage() {
       </div>
     );
   }
+  // ---------------------------------------------------------
 
-  // --- FORMULAIRE D'INSCRIPTION ---
   return (
+
     <div className="flex min-h-screen w-full bg-gray-100">
+
       <WorkflowColumn />
+
       <section className="flex flex-1 items-center justify-center p-8">
+
         <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl p-8">
+
           <div className="text-center mb-8">
-            <div className="text-5xl mb-3">⛽</div>
-            <h2 className="text-3xl font-bold">Créer un compte</h2>
-            <p className="text-gray-500 mt-2">Rejoignez la plateforme GNL Knowledge Graph</p>
+
+            <div className="text-5xl mb-3">
+              ⛽
+            </div>
+
+            <h2 className="text-3xl font-bold">
+              Créer un compte
+            </h2>
+
+            <p className="text-gray-500 mt-2">
+              Rejoignez la plateforme GNL Knowledge Graph
+            </p>
+
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-5"
+          >
+
             <div>
-              <label className="block mb-2 font-medium">Email</label>
+
+              <label className="block mb-2 font-medium">
+                Email
+              </label>
+
               <input
                 type="email"
                 required
@@ -173,9 +229,15 @@ export default function RegisterPage() {
                 placeholder="user@gnl.com"
                 className="w-full rounded-lg border px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none"
               />
+
             </div>
+
             <div>
-              <label className="block mb-2 font-medium">Mot de passe</label>
+
+              <label className="block mb-2 font-medium">
+                Mot de passe
+              </label>
+
               <input
                 type="password"
                 required
@@ -184,9 +246,15 @@ export default function RegisterPage() {
                 placeholder="********"
                 className="w-full rounded-lg border px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none"
               />
+
             </div>
+
             <div>
-              <label className="block mb-2 font-medium">Confirmation du mot de passe</label>
+
+              <label className="block mb-2 font-medium">
+                Confirmation du mot de passe
+              </label>
+
               <input
                 type="password"
                 required
@@ -195,25 +263,48 @@ export default function RegisterPage() {
                 placeholder="********"
                 className="w-full rounded-lg border px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none"
               />
+
             </div>
+
             <button
               type="submit"
               disabled={loading}
               className="w-full rounded-lg bg-green-600 py-3 text-white hover:bg-green-700 disabled:opacity-60 flex justify-center items-center gap-2"
             >
-              {loading && <LoadingSpinner size="small" color="white" />}
+
+              {loading && (
+                <LoadingSpinner
+                  size="small"
+                  color="white"
+                />
+              )}
+
               {loading ? "Création..." : "S'inscrire"}
+
             </button>
+
           </form>
 
           <div className="mt-8 text-center">
-            <span className="text-gray-500">Déjà un compte ?</span>
-            <Link href="/auth/login" className="ml-2 text-green-600 font-semibold hover:underline">
+
+            <span className="text-gray-500">
+              Déjà un compte ?
+            </span>
+
+            <Link
+              href="/auth/login"
+              className="ml-2 text-green-600 font-semibold hover:underline"
+            >
               Se connecter
             </Link>
+
           </div>
+
         </div>
+
       </section>
+
     </div>
+
   );
 }
