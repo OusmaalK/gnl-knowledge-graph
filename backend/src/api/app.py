@@ -273,7 +273,9 @@ def create_app() -> FastAPI:
         except HTTPException:
             raise
         except Exception as e:
+            import traceback
             logger.error(f"❌ Erreur lors de l'inscription: {e}")
+            logger.error(traceback.format_exc())  # <-- Cette ligne affiche la trace complète
             raise HTTPException(status_code=500, detail=f"Erreur interne: {str(e)}")
     
     @app.post("/api/auth/login")
