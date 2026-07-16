@@ -9,7 +9,7 @@ from jose import JWTError, jwt
 import bcrypt
 
 # --- CORRECTION : IMPORT ABSOLU (CRUCIAL POUR RAILWAY) ---
-from backend.src.core.config import settings
+from ...core.config import settings
 
 # Configuration
 SECRET_KEY = settings.JWT_SECRET

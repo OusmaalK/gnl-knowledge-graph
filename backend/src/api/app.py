@@ -18,7 +18,6 @@ from neo4j import GraphDatabase
 # Import pour le JWT
 from jose import JWTError
 from fastapi.security import OAuth2PasswordBearer
-# from ..core.security import verify_password, get_password_hash, create_access_token, ALGORITHM
 from .routers import graph, agents, queries, health
 from .middleware import logging as logging_middleware
 from .middleware import metrics as metrics_middleware
@@ -174,10 +173,7 @@ def create_app() -> FastAPI:
     @admin_router.get("/database/stats")
     async def get_database_stats():
         try:
-            driver = GraphDatabase.driver(
-                settings.NEO4J_URI, 
-                auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD)
-            )
+            driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
             with driver.session() as session:
                 nodes_result = session.run("MATCH (n) RETURN count(n) as count")
                 nodes_count = nodes_result.single()["count"]
@@ -204,11 +200,7 @@ def create_app() -> FastAPI:
                 raise HTTPException(status_code=401, detail="Token invalide")
             
             # Vérifier si l'utilisateur existe toujours dans Neo4j
-            from dotenv import load_dotenv
-            # env_path = os.path.join(os.path.dirname(__file__), '../../.env')
-            load_dotenv(override=True) 
-
-            driver = GraphDatabase.driver(os.getenv("NEO4J_URI"), auth=(os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASSWORD")))
+            driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
             with driver.session() as session:
                 result = session.run("MATCH (u:User {email: $email}) RETURN u", email=email)
                 record = result.single()
@@ -220,33 +212,13 @@ def create_app() -> FastAPI:
             return {"email": record["u"]["email"], "role": record["u"]["role"]}
         except JWTError:
             raise HTTPException(status_code=401, detail="Token invalide")
+
     @app.post("/api/auth/register")
     async def register_user(user_data: UserRegister):
         try:
-            import os
-            import sys
-            from dotenv import load_dotenv
+            from ...core.security import verify_password, create_access_token
             
-            # CHARGEMENT FORCÉ DES VARIABLES (sans fichier .env)
-            load_dotenv(override=True)
-            
-            # IMPORTATION ABSOLUE VIA LE CHEMIN DU DISQUE (100% fiable)
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            backend_root = os.path.dirname(os.path.dirname(current_dir))  # remonte jusqu'à backend/
-            sys.path.insert(0, backend_root)  # Ajoute le backend au path Python
-            
-            from src.core.security import get_password_hash
-            
-            # --------- Connexion Neo4j ---------
-            uri = os.getenv("NEO4J_URI")
-            user = os.getenv("NEO4J_USER")
-            password = os.getenv("NEO4J_PASSWORD")
-            
-            if not uri or not user or not password:
-                raise HTTPException(status_code=500, detail="Variables d'environnement Neo4j manquantes sur Railway")
-            
-            driver = GraphDatabase.driver("neo4j://6f8b0c72.databases.neo4j.io:7687", auth=(os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASSWORD")))
-            # ----------------------------------
+            driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
             
             with driver.session() as session:
                 # 1. Vérifier si l'email existe déjà
@@ -275,21 +247,15 @@ def create_app() -> FastAPI:
         except Exception as e:
             import traceback
             logger.error(f"❌ Erreur lors de l'inscription: {e}")
-            logger.error(traceback.format_exc())  # <-- Cette ligne affiche la trace complète
+            logger.error(traceback.format_exc())
             raise HTTPException(status_code=500, detail=f"Erreur interne: {str(e)}")
     
     @app.post("/api/auth/login")
     async def login_user(user_data: UserLogin):
         try:
-            # IMPORTATIONS CRUCIALES POUR RAILWAY
-            import os
-            from backend.src.core.security import verify_password, get_password_hash, create_access_token, ALGORITHM
-            from dotenv import load_dotenv
+            from ...core.security import verify_password, create_access_token
             
-            # Railway n'a pas de fichier .env, on ne charge que depuis l'environnement système
-            load_dotenv(override=True)
-            
-            driver = GraphDatabase.driver("neo4j://6f8b0c72.databases.neo4j.io:7687", auth=(os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASSWORD")))
+            driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
             
             with driver.session() as session:
                 # 1. Chercher l'utilisateur dans Neo4j
@@ -319,6 +285,7 @@ def create_app() -> FastAPI:
         except Exception as e:
             logger.error(f"❌ Erreur lors de la connexion: {e}")
             raise HTTPException(status_code=500, detail="Erreur interne du serveur")
+
     @app.get("/api/auth/me")
     async def read_users_me(current_user: dict = Depends(get_current_user)):
         return {"email": current_user["email"], "role": current_user["role"]}
@@ -330,11 +297,7 @@ def create_app() -> FastAPI:
     @app.get("/api/admin/users")
     async def get_all_users():
         try:
-            from dotenv import load_dotenv
-            env_path = os.path.join(os.path.dirname(__file__), '../../.env')
-            load_dotenv(env_path, override=True)
-            
-            driver = GraphDatabase.driver(os.getenv("NEO4J_URI"), auth=(os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASSWORD")))
+            driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
             with driver.session() as session:
                 result = session.run("""
                 MATCH (u:User)
@@ -367,7 +330,7 @@ def create_app() -> FastAPI:
             # ==========================================
             # 1. MISE À JOUR DU STATUT DANS NEO4J
             # ==========================================
-            driver = GraphDatabase.driver(os.getenv("NEO4J_URI"), auth=(os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASSWORD")))
+            driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
             with driver.session() as session:
                 session.run("""
                 MATCH (u:User {email: $email})
@@ -378,12 +341,10 @@ def create_app() -> FastAPI:
             # ==========================================
             # 2. ENVOI D'EMAIL VIA BREVO
             # ==========================================
-            # Configuration du client Brevo
             configuration = sib_api_v3_sdk.Configuration()
             configuration.api_key['api-key'] = os.getenv("BREVO_API_KEY")
             api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
 
-            # Construction de l'email
             sender_email = os.getenv("BREVO_SENDER_EMAIL", "admin@gnl.com")
             sender_name = os.getenv("BREVO_SENDER_NAME", "GNL Knowledge Graph")
 
@@ -414,13 +375,11 @@ def create_app() -> FastAPI:
                 """
             )
 
-            # Envoi de l'email
             try:
                 api_response = api_instance.send_transac_email(send_smtp_email)
                 logger.info(f"📧 Email envoyé avec succès à {email}")
             except ApiException as e:
                 logger.error(f"❌ Erreur lors de l'envoi de l'email: {e}")
-                # On ne bloque pas la requête si l'email échoue, l'utilisateur est déjà approuvé.
 
             return {"message": f"Utilisateur {email} approuvé avec le rôle {new_role}. Email envoyé."}
         except Exception as e:
@@ -431,11 +390,7 @@ def create_app() -> FastAPI:
     @app.post("/api/admin/users/{email:path}/disable")
     async def disable_user(email: str):
         try:
-            from dotenv import load_dotenv
-            env_path = os.path.join(os.path.dirname(__file__), '../../.env')
-            load_dotenv(env_path, override=True)
-            
-            driver = GraphDatabase.driver(os.getenv("NEO4J_URI"), auth=(os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASSWORD")))
+            driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
             with driver.session() as session:
                 session.run("""
                 MATCH (u:User {email: $email})
@@ -447,41 +402,22 @@ def create_app() -> FastAPI:
             logger.error(f"❌ Erreur lors de la désactivation: {e}")
             raise HTTPException(status_code=500, detail="Erreur interne")
 
-        # ========================================================
-    # ROUTE SUPPRESSION UTILISATEUR (VERSION ULTRA-ROBUSTE)
-    # ========================================================
     @app.delete("/api/admin/users/{email:path}")
     async def delete_user(email: str):
         try:
-            from dotenv import load_dotenv
-            import os
-            
-            # 1. Charger les variables d'environnement
-            env_path = os.path.join(os.path.dirname(__file__), '../../.env')
-            load_dotenv(env_path, override=True)
-            
-            uri = os.getenv("NEO4J_URI")
-            user = os.getenv("NEO4J_USER")
-            password = os.getenv("NEO4J_PASSWORD")
-            
-            logger.info(f"🔍 Tentative de suppression de l'utilisateur: {email}")
-            
-            # 2. Se connecter à Neo4j
-            driver = GraphDatabase.driver(uri, auth=(user, password))
+            driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
             
             with driver.session() as session:
-                # Exécuter la suppression ET récupérer le nombre de nœuds supprimés
                 result = session.run("MATCH (u:User {email: $email}) DELETE u RETURN count(u) as deleted_count", email=email)
                 record = result.single()
                 deleted_count = record["deleted_count"] if record else 0
                 
-                # Si aucun nœud n'a été supprimé, c'est que l'utilisateur n'existe pas
                 if deleted_count == 0:
                     driver.close()
                     raise HTTPException(status_code=404, detail=f"Utilisateur {email} non trouvé")
             
             driver.close()
-            logger.info(f"✅ Utilisateur {email} supprimé avec succès (ID: {deleted_count})")
+            logger.info(f"✅ Utilisateur {email} supprimé avec succès")
             return {"message": f"Utilisateur {email} supprimé"}
             
         except HTTPException:
@@ -664,19 +600,8 @@ def create_app() -> FastAPI:
     # ========================================================
     @app.get("/api/analysis/{tab}")
     async def get_analysis_data(tab: str, period: str = '30d', equipment: str = 'all', severity: str = 'all'):
-        # === CORRECTION : FORCER LE RECHARGEMENT DU .ENV ===
-        from dotenv import load_dotenv
-        import os
-        env_path = os.path.join(os.path.dirname(__file__), '../../.env')
-        load_dotenv(env_path, override=True)
-        
-        uri = os.getenv("NEO4J_URI")
-        user = os.getenv("NEO4J_USER")
-        password = os.getenv("NEO4J_PASSWORD")
-        # ==================================================
-
         try:
-            driver = GraphDatabase.driver(uri, auth=(user, password))
+            driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
             result_data = {}
             
             with driver.session() as session:
@@ -846,15 +771,8 @@ def create_app() -> FastAPI:
         dateRange: str = "30d",
         search: str = ""
     ):
-        # --- SOLUTION ULTIME : FORCER LES IDENTIFIANTS MANUELLEMENT ---
-        # Si le .env ne charge pas, on met les valeurs en dur.
-        uri = "neo4j://127.0.0.1:7687"
-        user = "neo4j"
-        password = "GnL_Neo4j_2026_Secure!"
-        # ------------------------------------------------------------
-
         try:
-            driver = GraphDatabase.driver(uri, auth=(user, password))
+            driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
             
             with driver.session() as session:
                 result = session.run("""
@@ -941,16 +859,7 @@ def create_app() -> FastAPI:
     @app.get("/api/settings/iot")
     async def get_iot_settings():
         try:
-            # Recharger le .env fraîchement pour s'assurer que le port 7687 est bien utilisé
-            from dotenv import load_dotenv
-            env_path = os.path.join(os.path.dirname(__file__), '../../.env')
-            load_dotenv(env_path, override=True)
-            
-            uri = os.getenv("NEO4J_URI")
-            user = os.getenv("NEO4J_USER")
-            password = os.getenv("NEO4J_PASSWORD")
-            
-            driver = GraphDatabase.driver(uri, auth=(user, password))
+            driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
             with driver.session() as session:
                 result = session.run("MATCH (s:IoTSettings) RETURN s")
                 record = result.single()
@@ -974,17 +883,7 @@ def create_app() -> FastAPI:
     @app.post("/api/settings/iot")
     async def save_iot_settings(request: IoTSettingsRequest):
         try:
-            # === CORRECTION ULTIME : Forcer le rechargement du .env ici ===
-            from dotenv import load_dotenv
-            env_path = os.path.join(os.path.dirname(__file__), '../../.env')
-            load_dotenv(env_path, override=True)
-            
-            # Utiliser les variables rechargées directement
-            uri = os.getenv("NEO4J_URI")
-            user = os.getenv("NEO4J_USER")
-            password = os.getenv("NEO4J_PASSWORD")
-            
-            driver = GraphDatabase.driver(uri, auth=(user, password))
+            driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
             with driver.session() as session:
                 session.run("""
                 MERGE (s:IoTSettings)
@@ -1041,7 +940,6 @@ def create_app() -> FastAPI:
             import paho.mqtt.client as mqtt
             import json
             
-            # Récupérer les données envoyées par le frontend
             equipment_id = sensor_data.get('equipment_id')
             temperature = sensor_data.get('temperature')
             pression = sensor_data.get('pression')
@@ -1049,13 +947,11 @@ def create_app() -> FastAPI:
             if not equipment_id:
                 raise HTTPException(status_code=400, detail="L'ID de l'équipement est requis")
             
-            # Construire le payload JSON
             payload = {
                 "temperature": temperature,
                 "pression": pression
             }
             
-            # Se connecter au broker MQTT et envoyer le message
             client = mqtt.Client()
             client.connect("localhost", 1883, 60)
             client.publish(f"gnl/{equipment_id}/sensors", json.dumps(payload))
