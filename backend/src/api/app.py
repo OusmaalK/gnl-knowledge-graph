@@ -21,9 +21,18 @@ from fastapi.security import OAuth2PasswordBearer
 from .routers import graph, agents, queries, health
 from .middleware import logging as logging_middleware
 from .middleware import metrics as metrics_middleware
-from ..core.config import settings
-from ..core.exceptions import GNLException
 from .routers import websocket
+
+# --- SOLUTION FINALE POUR LES IMPORTS SUR RAILWAY ---
+import sys
+import os
+# Ajoute le dossier 'backend' au path de Python
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+
+from src.core.config import settings
+from src.core.exceptions import GNLException
+from src.core.security import verify_password, get_password_hash, create_access_token
+# ---------------------------------------------------
 
 logger = logging.getLogger(__name__)
 
@@ -216,8 +225,6 @@ def create_app() -> FastAPI:
     @app.post("/api/auth/register")
     async def register_user(user_data: UserRegister):
         try:
-            from ...core.security import verify_password, create_access_token
-            
             driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
             
             with driver.session() as session:
@@ -253,8 +260,6 @@ def create_app() -> FastAPI:
     @app.post("/api/auth/login")
     async def login_user(user_data: UserLogin):
         try:
-            from ...core.security import verify_password, create_access_token
-            
             driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
             
             with driver.session() as session:

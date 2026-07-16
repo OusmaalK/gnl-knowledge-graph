@@ -8,8 +8,8 @@ from typing import Optional
 from jose import JWTError, jwt
 import bcrypt
 
-# --- CORRECTION : IMPORT ABSOLU (CRUCIAL POUR RAILWAY) ---
-from ...core.config import settings
+# --- CORRECTION : IMPORT ABSOLU VIA SRC (FONCTIONNE SUR RAILWAY) ---
+from src.core.config import settings
 
 # Configuration
 SECRET_KEY = settings.JWT_SECRET
