@@ -7,7 +7,9 @@ from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
 import bcrypt
-from ..core.config import settings
+
+# --- CORRECTION : IMPORT ABSOLU (CRUCIAL POUR RAILWAY) ---
+from backend.src.core.config import settings
 
 # Configuration
 SECRET_KEY = settings.JWT_SECRET
