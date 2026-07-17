@@ -1012,6 +1012,26 @@ def create_app() -> FastAPI:
     @app.post("/api/iot/simulate")
     async def simulate_sensor(sensor_data: dict = Body(...)):
         try:
+            import sys
+            import os
+            
+            # Importer l'état de l'écouteur
+            backend_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            scripts_data_dir = os.path.join(backend_root, 'scripts', 'data')
+            if scripts_data_dir not in sys.path:
+                sys.path.insert(0, scripts_data_dir)
+            
+            from iot_manager import is_running
+            
+            # Vérifier si l'écouteur est actif
+            if not is_running():
+                # --- CORRECTION : Renvoyer un message clair au Frontend ---
+                return JSONResponse(
+                    status_code=400,
+                    content={"detail": "L'écouteur n'est pas actif."}
+                )
+                # ----------------------------------------------------
+            
             import paho.mqtt.client as mqtt
             import json
             
