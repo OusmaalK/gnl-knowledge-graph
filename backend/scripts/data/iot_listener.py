@@ -72,7 +72,7 @@ def decode_payload_safely(raw_bytes):
 
 def fetch_config_from_api():
     try:
-        response = requests.get("http://localhost:8000/api/settings/iot", timeout=5)
+        response = requests.get("https://gnl-knowledge-graph-production.up.railway.app/api/settings/iot", timeout=5)
         if response.status_code == 200:
             print("✅ Configuration chargée depuis Neo4j (via API)")
             return response.json()
