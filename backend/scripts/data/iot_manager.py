@@ -17,8 +17,6 @@ def start_listener():
         return {"status": "already_running", "message": "L'écouteur est déjà actif."}
     
     try:
-        # Lancer le script en arrière-plan (sans terminal)
-        # 'start' est nécessaire sur Windows pour lancer un processus détaché
         _process = subprocess.Popen(
             [sys.executable, LISTENER_SCRIPT],
             stdout=subprocess.DEVNULL,
