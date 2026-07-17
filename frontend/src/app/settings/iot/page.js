@@ -30,7 +30,7 @@ export default function IoTSettingsPage() {
   });
 
   // États pour le contrôle de l'écouteur IoT
-  const [iotStatus, setIotStatus] = useState('stopped'); // Démarrer par défaut sur "stopped"
+  const [iotStatus, setIotStatus] = useState('stopped');
   const [loadingIot, setLoadingIot] = useState(false);
 
   // États pour le simulateur de capteur
@@ -81,16 +81,17 @@ export default function IoTSettingsPage() {
     } catch (e) { 
       setIotStatus('stopped'); 
     }
-};
+  };
 
-  // --- CORRECTION MAJEURE DE LA FONCTION TOGGLE ---
+  // --- FONCTION TOGGLE CORRIGÉE ---
   const toggleIot = async () => {
     setLoadingIot(true);
     const action = iotStatus === 'running' ? 'stop' : 'start';
+    
     try {
       const res = await post('/api/iot/control', { action: action });
       
-      // --- CORRECTION : Gérer correctement l'arrêt ---
+      // Forcer l'état immédiatement selon la réponse du Backend
       if (res.status === 'started') {
         setIotStatus('running');
         toast.success(res.message);
@@ -100,7 +101,6 @@ export default function IoTSettingsPage() {
       } else {
         toast.error(res.message);
       }
-      // ---------------------------------------------
       
     } catch (e) {
       toast.error('Erreur de communication');
@@ -108,7 +108,7 @@ export default function IoTSettingsPage() {
       setLoadingIot(false);
     }
   };
-  // ----------------------------------------------------
+  // ----------------------------------
 
   // Fonction pour envoyer la donnée de test
   const handleSimulate = async () => {
