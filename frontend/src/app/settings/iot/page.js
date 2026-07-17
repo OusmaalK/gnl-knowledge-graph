@@ -80,14 +80,18 @@ export default function IoTSettingsPage() {
     }
   };
 
-  const toggleIot = async () => {
+    const toggleIot = async () => {
     setLoadingIot(true);
     const action = iotStatus === 'running' ? 'stop' : 'start';
     try {
       const res = await post('/api/iot/control', { action: action });
       if(res.status === 'started' || res.status === 'stopped') {
         toast.success(res.message);
-        checkIotStatus();
+        // --- CORRECTION : On attend 2 secondes avant de vérifier l'état ---
+        setTimeout(() => {
+          checkIotStatus();
+        }, 2000);
+        // ----------------------------------------------------------------
       } else {
         toast.error(res.message);
       }
