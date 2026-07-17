@@ -87,25 +87,21 @@ export default function IoTSettingsPage() {
   const toggleIot = async () => {
     setLoadingIot(true);
     const action = iotStatus === 'running' ? 'stop' : 'start';
-    
     try {
       const res = await post('/api/iot/control', { action: action });
       
-      if (res.status === 'started' || res.status === 'stopped') {
+      // --- CORRECTION : Gérer correctement l'arrêt ---
+      if (res.status === 'started') {
+        setIotStatus('running');
         toast.success(res.message);
-        
-        // --- FORÇAGE INSTANTANÉ DE L'ÉTAT ---
-        if (res.status === 'started' || res.status === 'success' || res.status === 'running') {
-          setIotStatus('running'); // Le bouton devient VERT
-        } else if (res.status === 'stopped') {
-          setIotStatus('stopped'); // Le bouton devient ROUGE
-        }
-
-        // ----------------------------------------
-        
+      } else if (res.status === 'stopped') {
+        setIotStatus('stopped');
+        toast.success(res.message);
       } else {
         toast.error(res.message);
       }
+      // ---------------------------------------------
+      
     } catch (e) {
       toast.error('Erreur de communication');
     } finally {
