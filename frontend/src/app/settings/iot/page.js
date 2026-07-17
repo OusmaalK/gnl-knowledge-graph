@@ -30,7 +30,7 @@ export default function IoTSettingsPage() {
   });
 
   // États pour le contrôle de l'écouteur IoT
-  const [iotStatus, setIotStatus] = useState('unknown');
+  const [iotStatus, setIotStatus] = useState('stopped'); // Démarrer par défaut sur "stopped"
   const [loadingIot, setLoadingIot] = useState(false);
 
   // États pour le simulateur de capteur
@@ -76,25 +76,29 @@ export default function IoTSettingsPage() {
       const res = await post('/api/iot/control', { action: 'status' });
       setIotStatus(res.running ? 'running' : 'stopped');
     } catch (e) { 
-      setIotStatus('unknown'); 
+      setIotStatus('stopped'); // Valeur par défaut en cas d'erreur
     }
   };
 
-    const toggleIot = async () => {
+  // --- CORRECTION MAJEURE DE LA FONCTION TOGGLE ---
+  const toggleIot = async () => {
     setLoadingIot(true);
     const action = iotStatus === 'running' ? 'stop' : 'start';
+    
     try {
       const res = await post('/api/iot/control', { action: action });
-      if(res.status === 'started' || res.status === 'stopped') {
+      
+      if (res.status === 'started' || res.status === 'stopped') {
         toast.success(res.message);
         
-        // --- CORRECTION ULTIME : Forcer le statut localement ---
+        // --- FORÇAGE INSTANTANÉ DE L'ÉTAT ---
         if (res.status === 'started') {
-          setIotStatus('running');  // On force le vert immédiatement
-        } else {
-          setIotStatus('stopped');  // On force le rouge immédiatement
+          setIotStatus('running'); // Le bouton devient VERT
+        } else if (res.status === 'stopped') {
+          setIotStatus('stopped'); // Le bouton devient ROUGE
         }
-        // ----------------------------------------------------
+        // ----------------------------------------
+        
       } else {
         toast.error(res.message);
       }
@@ -104,6 +108,7 @@ export default function IoTSettingsPage() {
       setLoadingIot(false);
     }
   };
+  // ----------------------------------------------------
 
   // Fonction pour envoyer la donnée de test
   const handleSimulate = async () => {
