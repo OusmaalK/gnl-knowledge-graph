@@ -80,27 +80,30 @@ export default function IoTSettingsPage() {
     }
   };
 
-  const toggleIot = async () => {
-  setLoadingIot(true);
-  const action = iotStatus === 'running' ? 'stop' : 'start';
-  try {
-    const res = await post('/api/iot/control', { action: action });
-    if(res.status === 'started' || res.status === 'stopped') {
-      toast.success(res.message);
-      // --- CORRECTION : On attend 3 secondes avant de vérifier l'état ---
-      setTimeout(async () => {
-        await checkIotStatus();
-      }, 3000); // 3 secondes
-      // ----------------------------------------------------------------
-    } else {
-      toast.error(res.message);
+    const toggleIot = async () => {
+    setLoadingIot(true);
+    const action = iotStatus === 'running' ? 'stop' : 'start';
+    try {
+      const res = await post('/api/iot/control', { action: action });
+      if(res.status === 'started' || res.status === 'stopped') {
+        toast.success(res.message);
+        
+        // --- CORRECTION ULTIME : Forcer le statut localement ---
+        if (res.status === 'started') {
+          setIotStatus('running');  // On force le vert immédiatement
+        } else {
+          setIotStatus('stopped');  // On force le rouge immédiatement
+        }
+        // ----------------------------------------------------
+      } else {
+        toast.error(res.message);
+      }
+    } catch (e) {
+      toast.error('Erreur de communication');
+    } finally {
+      setLoadingIot(false);
     }
-  } catch (e) {
-    toast.error('Erreur de communication');
-  } finally {
-    setLoadingIot(false);
-  }
-};
+  };
 
   // Fonction pour envoyer la donnée de test
   const handleSimulate = async () => {
