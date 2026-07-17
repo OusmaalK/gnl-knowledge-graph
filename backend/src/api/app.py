@@ -945,7 +945,7 @@ def create_app() -> FastAPI:
             else:
                 return {
                     "mqtt_broker": "dc96b001.ala.eu-central-1.emqxsl.com",
-                    "mqtt_port": 1883,
+                    "mqtt_port": 8883,
                     "mqtt_topic": "gnl/+/sensors",
                     "neo4j_label": "SensorData",
                     "alert_threshold_temperature": 80,
@@ -1028,7 +1028,7 @@ def create_app() -> FastAPI:
             }
             
             client = mqtt.Client()
-            client.connect("dc96b001.ala.eu-central-1.emqxsl.com", 1883, 60)
+            client.connect("dc96b001.ala.eu-central-1.emqxsl.com", 8883, 60)
             client.publish(f"gnl/{equipment_id}/sensors", json.dumps(payload))
             client.disconnect()
             
