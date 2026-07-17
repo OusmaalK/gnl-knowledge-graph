@@ -73,12 +73,15 @@ export default function IoTSettingsPage() {
   // Fonctions pour piloter l'écouteur IoT
   const checkIotStatus = async () => {
     try {
+      // Attendre 1 seconde avant de demander l'état pour laisser le temps au système
+      await new Promise(resolve => setTimeout(resolve, 1000)); 
+      
       const res = await post('/api/iot/control', { action: 'status' });
       setIotStatus(res.running ? 'running' : 'stopped');
     } catch (e) { 
-      setIotStatus('stopped'); // Valeur par défaut en cas d'erreur
+      setIotStatus('stopped'); 
     }
-  };
+};
 
   // --- CORRECTION MAJEURE DE LA FONCTION TOGGLE ---
   const toggleIot = async () => {
@@ -92,11 +95,12 @@ export default function IoTSettingsPage() {
         toast.success(res.message);
         
         // --- FORÇAGE INSTANTANÉ DE L'ÉTAT ---
-        if (res.status === 'started') {
+        if (res.status === 'started' || res.status === 'success' || res.status === 'running') {
           setIotStatus('running'); // Le bouton devient VERT
         } else if (res.status === 'stopped') {
           setIotStatus('stopped'); // Le bouton devient ROUGE
         }
+
         // ----------------------------------------
         
       } else {
