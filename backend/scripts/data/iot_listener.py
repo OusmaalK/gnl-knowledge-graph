@@ -14,8 +14,10 @@ from datetime import datetime
 # ========================================================
 # CONFIGURATION
 # ========================================================
+BACKEND_API_URL = "https://gnl-knowledge-graph-production.up.railway.app"
+
 DEFAULT_CONFIG = {
-    "mqtt_broker": "localhost",
+    "mqtt_broker": "dc96b001.ala.eu-central-1.emqxsl.com",  # <-- Remplacé localhost par le broker EMQX
     "mqtt_port": 1883,
     "mqtt_topic": "gnl/+/sensors",
     "neo4j_label": "SensorData",
@@ -72,7 +74,7 @@ def decode_payload_safely(raw_bytes):
 
 def fetch_config_from_api():
     try:
-        response = requests.get("https://gnl-knowledge-graph-production.up.railway.app/api/settings/iot", timeout=5)
+        response = requests.get(f"{BACKEND_API_URL}/api/settings/iot", timeout=5)
         if response.status_code == 200:
             print("✅ Configuration chargée depuis Neo4j (via API)")
             return response.json()
@@ -99,7 +101,7 @@ def create_incident_in_neo4j(equipment_id, reason, value, threshold):
     
     try:
         # Envoyer au backend pour création dans Neo4j
-        response = requests.post("http://localhost:8000/api/incidents/auto", json=payload, timeout=5)
+        response = requests.post(f"{BACKEND_API_URL}/api/incidents/auto", json=payload, timeout=5)
         if response.status_code == 200:
             print(f"🚨 INCIDENT CRÉÉ AUTOMATIQUEMENT : {incident_id} pour {equipment_id}")
             return True
