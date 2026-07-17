@@ -510,15 +510,11 @@ def create_app() -> FastAPI:
             import sys
             import os
             
-            # --- SOLUTION ULTIME POUR RAILWAY ---
-            # Obtenir le chemin absolu du dossier backend
             backend_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
             scripts_data_dir = os.path.join(backend_root, 'scripts', 'data')
             
-            # Ajouter au path Python
             if scripts_data_dir not in sys.path:
                 sys.path.insert(0, scripts_data_dir)
-            # ------------------------------------
             
             try:
                 from iot_manager import start_listener, stop_listener, get_status
@@ -530,7 +526,7 @@ def create_app() -> FastAPI:
             elif action == 'stop':
                 return stop_listener()
             elif action == 'status':
-                return get_status()
+                return get_status()  # <--- C'est cette ligne qui manquait
             else:
                 return {"status": "error", "message": "Action inconnue"}
         except Exception as e:
